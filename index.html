@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LABCOMPT PUTRA - Manajemen Lab</title>
+    <title>LABCOMPT PUTRA - Manajemen Lab Terpadu</title>
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,9 +11,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS & Chart.js -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
         tailwind.config = {
@@ -36,11 +37,11 @@
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f4f7f6; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
         .tab-content.active { display: block; }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -61,7 +62,7 @@
             background-color: white !important;
             color: #0a4a35 !important;
             font-weight: 700 !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             transform: scale(1.02);
         }
         @media print {
@@ -77,35 +78,49 @@
     <!-- TOAST NOTIFICATION CONTAINER -->
     <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-2"></div>
 
-    <!-- LOGIN OVERLAY -->
-    <div id="login-overlay" class="fixed inset-0 bg-brand-900 z-[100] flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
-            <div class="text-center mb-8">
-                <div class="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fa-solid fa-microchip text-4xl text-brand-600"></i>
+    <!-- LOGIN OVERLAY WITH LOADER ANIMATION -->
+    <div id="login-overlay" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl relative">
+            <div id="login-box-content">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-100 shadow-inner">
+                        <i class="fa-solid fa-microchip text-4xl text-brand-600"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-slate-800">LABCOMPT PUTRA</h1>
+                    <p class="text-slate-500 text-sm mt-1">Pusat Layanan Laboratorium Komputer Terpadu</p>
                 </div>
-                <h1 class="text-2xl font-bold text-slate-800">LABCOMPT PUTRA</h1>
-                <p class="text-slate-500 text-sm mt-1">Sistem Manajemen Laboratorium Terpadu</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+                        <input type="text" id="login-username" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 bg-slate-50" placeholder="admin / tamu">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                        <input type="password" id="login-password" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 bg-slate-50" placeholder="admin123 / tamu123">
+                    </div>
+                    <button type="button" onclick="handleLogin()" class="w-full bg-brand-600 text-white py-3 rounded-xl font-bold hover:bg-brand-700 transition-colors mt-2 shadow-md">
+                        Masuk Sistem
+                    </button>
+                </div>
+                
+                <div class="mt-6 p-4 bg-slate-50 rounded-xl text-xs text-slate-500 text-center border border-slate-100">
+                    <p><b>Akun Demo:</b></p>
+                    <p>Admin: <code class="font-bold text-slate-700">admin</code> | <code class="font-bold text-slate-700">admin123</code></p>
+                    <p>Pengunjung: <code class="font-bold text-slate-700">tamu</code> | <code class="font-bold text-slate-700">tamu123</code></p>
+                </div>
             </div>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
-                    <input type="text" id="login-username" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 bg-slate-50" placeholder="admin / tamu">
+
+            <!-- MEMVERIFIKASI LOADER SPINNER -->
+            <div id="login-loader" class="hidden text-center py-12">
+                <div class="w-16 h-16 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <h3 class="text-lg font-bold text-slate-800">Memverifikasi login</h3>
+                <p class="text-sm text-slate-500 mt-1">Sedang memeriksa username dan password...</p>
+                <div class="flex justify-center gap-1.5 mt-4">
+                    <span class="w-2 h-2 bg-brand-500 rounded-full animate-bounce"></span>
+                    <span class="w-2 h-2 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                    <span class="w-2 h-2 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></span>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                    <input type="password" id="login-password" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 bg-slate-50" placeholder="admin123 / tamu123">
-                </div>
-                <button type="button" onclick="handleLogin()" class="w-full bg-brand-600 text-white py-3 rounded-xl font-bold hover:bg-brand-700 transition-colors mt-2 shadow-md">
-                    Masuk
-                </button>
-            </div>
-            
-            <div class="mt-6 p-4 bg-slate-50 rounded-xl text-xs text-slate-500 text-center border border-slate-100">
-                <p><b>Akun Demo:</b></p>
-                <p>Admin: <code class="font-bold text-slate-700">admin</code> | <code class="font-bold text-slate-700">admin123</code></p>
-                <p>Pengunjung: <code class="font-bold text-slate-700">tamu</code> | <code class="font-bold text-slate-700">tamu123</code></p>
             </div>
         </div>
     </div>
@@ -113,10 +128,10 @@
     <!-- APP WRAPPER -->
     <div id="app-wrapper" class="flex h-full hidden">
         <!-- Sidebar -->
-        <aside class="w-64 shrink-0 bg-brand-900 text-white flex flex-col transition-all duration-300 md:relative absolute z-50 h-full -translate-x-full md:translate-x-0" id="sidebar">
+        <aside class="w-64 shrink-0 bg-brand-900 text-white flex flex-col transition-all duration-300 md:relative absolute z-50 h-full -translate-x-full md:translate-x-0 shadow-xl" id="sidebar">
             <div class="p-6 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <img id="sidebar-logo" src="https://placehold.co/100x100/ffffff/0a4a35?text=LCP" alt="Logo" class="w-10 h-10 rounded-full object-cover bg-white p-1">
+                    <img id="sidebar-logo" src="https://placehold.co/100x100/ffffff/0a4a35?text=LCP" alt="Logo" class="w-10 h-10 rounded-full object-cover bg-white p-1 shadow">
                     <h1 class="text-lg font-bold tracking-tight leading-tight" id="sidebar-title">LABCOMPT<br>PUTRA</h1>
                 </div>
                 <button class="md:hidden text-brand-300 hover:text-white" onclick="toggleSidebar()">
@@ -124,7 +139,7 @@
                 </button>
             </div>
             
-            <nav class="flex-1 mt-4 space-y-1 py-2">
+            <nav class="flex-1 mt-2 space-y-1 py-2">
                 <button id="nav-dashboard" onclick="switchTab('dashboard')" class="nav-btn active-nav flex items-center gap-3 px-4 py-3 text-brand-100 hover:bg-brand-800">
                     <i class="fa-solid fa-chart-pie w-5"></i>
                     <span class="font-medium text-sm">Dashboard</span>
@@ -156,7 +171,7 @@
             </nav>
 
             <div class="p-4 mb-4">
-                <button onclick="handleLogout()" class="w-full bg-red-500/20 text-red-100 hover:bg-red-500 hover:text-white py-2.5 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 text-sm">
+                <button onclick="handleLogout()" class="w-full bg-red-500/20 text-red-100 hover:bg-red-500 hover:text-white py-2.5 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 text-sm shadow">
                     <i class="fa-solid fa-power-off"></i> Keluar Sistem
                 </button>
             </div>
@@ -170,7 +185,7 @@
                         <i class="fa-solid fa-bars text-xl"></i>
                     </button>
                     <div class="hidden sm:flex items-center gap-2 bg-brand-50 text-brand-700 px-3 py-1.5 rounded-full text-xs font-bold border border-brand-100">
-                        <i class="fa-solid fa-angles-left"></i>
+                        <i class="fa-solid fa-calendar"></i>
                         <span>Tahun Ajaran: 2026/2027 - Ganjil</span>
                     </div>
                 </div>
@@ -191,18 +206,31 @@
 
             <div class="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
                 <!-- DASHBOARD -->
-                <section id="dashboard" class="tab-content active max-w-6xl mx-auto">
-                    <div class="bg-brand-800 text-white p-8 md:p-10 rounded-2xl shadow-md mb-6 relative overflow-hidden">
-                        <div class="relative z-10">
-                            <h2 class="text-2xl md:text-3xl font-bold mb-2" id="ui-banner-title">Selamat Datang di LABCOMPT PUTRA</h2>
+                <section id="dashboard" class="tab-content active max-w-6xl mx-auto space-y-6">
+                    <div id="dashboard-banner-box" class="bg-brand-800 text-white p-8 md:p-10 rounded-2xl shadow-lg relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-6 bg-cover bg-center">
+                        <div class="relative z-10 bg-black/30 p-4 rounded-xl backdrop-blur-sm">
+                            <span class="bg-brand-700 text-brand-100 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">Pusat Layanan Lab</span>
+                            <h2 class="text-2xl md:text-3xl font-bold mt-2 mb-1" id="ui-banner-title">Selamat Datang di LABCOMPT PUTRA</h2>
                             <p class="text-brand-200 text-sm md:text-base opacity-90" id="ui-banner-subtitle">Pusat Komputer dan Teknologi Informasi</p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 flex items-center gap-4 text-center">
+                            <div>
+                                <p class="text-xs text-brand-200">Total Aset</p>
+                                <p class="text-2xl font-bold text-white" id="dash-total-aset">0</p>
+                            </div>
+                            <div class="w-px h-8 bg-white/20"></div>
+                            <div>
+                                <p class="text-xs text-brand-200">Dipinjam</p>
+                                <p class="text-2xl font-bold text-amber-300" id="dash-dipinjam">0</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Stat Cards Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-slate-500">Total Aset</p>
+                                <p class="text-sm font-medium text-slate-500">Total Aset Lab</p>
                                 <h3 class="text-3xl font-bold text-slate-800 mt-1" id="stat-total-aset">0</h3>
                             </div>
                             <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl">
@@ -225,6 +253,26 @@
                             </div>
                             <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
                                 <i class="fa-solid fa-calendar-check"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GRAFIK STATISTIK SECTION -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                            <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-chart-pie text-brand-600"></i> Statistik Status Aset Lab
+                            </h3>
+                            <div class="h-64 flex items-center justify-center">
+                                <canvas id="assetChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                            <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-chart-bar text-brand-600"></i> Tren Peminjaman & Pengembalian
+                            </h3>
+                            <div class="h-64 flex items-center justify-center">
+                                <canvas id="borrowChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -377,7 +425,7 @@
                 <section id="pengaturan" class="tab-content max-w-4xl mx-auto admin-only">
                     <div class="mb-6">
                         <h2 class="text-2xl font-bold text-slate-800">Pengaturan Aplikasi</h2>
-                        <p class="text-slate-500 text-sm">Kustomisasi identitas laboratorium dan banner</p>
+                        <p class="text-slate-500 text-sm">Kustomisasi identitas laboratorium, logo, dan banner</p>
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
                         <div>
@@ -387,6 +435,18 @@
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Teks Banner Utama</label>
                             <input type="text" id="setting-banner" value="Pusat Komputer dan Teknologi Informasi" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Upload Logo Sidebar</label>
+                            <input type="file" id="setting-logo-file" accept="image/*" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Pilihan Banner Dashboard</label>
+                            <select id="setting-banner-mode" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 mb-2">
+                                <option value="default">Default Warna Hijau (Bawaan)</option>
+                                <option value="custom">Upload Gambar Kustom</option>
+                            </select>
+                            <input type="file" id="setting-banner-file" accept="image/*" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                         <button onclick="saveSettings()" class="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm">Simpan Pengaturan</button>
                     </div>
@@ -491,24 +551,75 @@
     </div>
 
     <script>
-        let currentUser = null;
-        let settings = { name: "LABCOMPT PUTRA", banner: "Pusat Komputer dan Teknologi Informasi" };
-        let inventory = JSON.parse(localStorage.getItem('lcp_inventory')) || [
-            { id: 'INV-LABCOMP-001', name: 'RUANG LAB 01', condition: 'Baik', location: 'Gedung Utama', status: 'Dipinjam', borrower: 'KARIM', purpose: 'IAIWS' },
-            { id: 'LAB-PC-002', name: 'PC Client', condition: 'Baik', location: 'Meja 02', status: 'Tersedia', borrower: '-', purpose: '-' },
-            { id: 'LAB-PR-001', name: 'Proyektor', condition: 'Baik', location: 'Lemari A', status: 'Tersedia', borrower: '-', purpose: '-' }
-        ];
-        let schedules = JSON.parse(localStorage.getItem('lcp_schedules')) || [
-            { id: 1, date: '2026-11-06', start: '08:00', end: '10:00', teacher: 'Pak Andi', subject: 'Pemrograman Web' }
-        ];
-        let borrowHistory = JSON.parse(localStorage.getItem('lcp_history')) || [
-            { id: 1, assetId: 'INV-LABCOMP-001', assetName: 'RUANG LAB 01', borrower: 'KARIM (IAIWS)', purpose: 'IAIWS', borrowDate: '2026-11-06 11:03', returnDate: '-', status: 'Dipinjam' }
-        ];
+        // Ganti URL Web App ini dengan URL deployment Google Apps Script Anda
+        const API_URL = "https://script.google.com/macros/s/AKfycby_COVhJB0NqneA3vAxj82GRBMnIKQ4jw6ODssAv0t2gYPpkcIQD1ro5QDDuvr_QuW4zA/exec";
 
-        function saveData() {
+        let currentUser = null;
+        let settings = JSON.parse(localStorage.getItem('lcp_settings')) || { 
+            name: "LABCOMPT PUTRA", 
+            banner: "Pusat Komputer dan Teknologi Informasi",
+            logoUrl: "https://placehold.co/100x100/ffffff/0a4a35?text=LCP",
+            bannerMode: "default",
+            bannerUrl: ""
+        };
+
+        let inventory = [];
+        let schedules = [];
+        let borrowHistory = [];
+
+        let assetChartInstance = null;
+        let borrowChartInstance = null;
+
+        // Fetch data dari Google Sheets secara otomatis saat web dibuka
+        async function fetchSheetData() {
+            try {
+                const res = await fetch(API_URL + "?action=getData");
+                const result = await res.json();
+                if (result.status === "success") {
+                    inventory = result.inventory.length > 0 ? result.inventory : getDefaultInventory();
+                    schedules = result.schedules.length > 0 ? result.schedules : [];
+                    borrowHistory = result.borrowHistory.length > 0 ? result.borrowHistory : [];
+                    renderAll();
+                }
+            } catch (e) {
+                // Fallback ke localStorage jika offline
+                inventory = JSON.parse(localStorage.getItem('lcp_inventory')) || getDefaultInventory();
+                schedules = JSON.parse(localStorage.getItem('lcp_schedules')) || [];
+                borrowHistory = JSON.parse(localStorage.getItem('lcp_history')) || [];
+                renderAll();
+            }
+        }
+
+        function getDefaultInventory() {
+            return [
+                { id: 'INV-LABCOMP-001', name: 'RUANG LAB 01', condition: 'Baik', location: 'Gedung Utama', status: 'Dipinjam', borrower: 'KARIM', purpose: 'IAIWS' },
+                { id: 'LAB-PC-002', name: 'PC Client', condition: 'Baik', location: 'Meja 02', status: 'Tersedia', borrower: '-', purpose: '-' },
+                { id: 'LAB-PR-001', name: 'Proyektor', condition: 'Baik', location: 'Lemari A', status: 'Tersedia', borrower: '-', purpose: '-' }
+            ];
+        }
+
+        async function syncToSheet() {
+            // Simpan lokal dulu sebagai backup instan
             localStorage.setItem('lcp_inventory', JSON.stringify(inventory));
             localStorage.setItem('lcp_schedules', JSON.stringify(schedules));
             localStorage.setItem('lcp_history', JSON.stringify(borrowHistory));
+
+            // Kirim ke Google Sheets di background
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'saveData',
+                        inventory: inventory,
+                        schedules: schedules,
+                        borrowHistory: borrowHistory
+                    })
+                });
+            } catch (e) {
+                console.log('Sync background error:', e);
+            }
         }
 
         function checkAuth() {
@@ -521,7 +632,7 @@
                 loginOverlay.classList.add('hidden');
                 appWrapper.classList.remove('hidden');
                 applyPermissions();
-                renderAll();
+                fetchSheetData();
                 switchTab('dashboard');
             } else {
                 loginOverlay.classList.remove('hidden');
@@ -533,14 +644,17 @@
             const userInp = document.getElementById('login-username').value.trim().toLowerCase();
             const passInp = document.getElementById('login-password').value.trim();
 
-            if (userInp === 'admin' && passInp === 'admin123') {
-                currentUser = { role: 'admin', name: 'Operator Utama' };
-                sessionStorage.setItem('lcp_user', JSON.stringify(currentUser));
-                checkAuth();
-            } else if (userInp === 'tamu' && passInp === 'tamu123') {
-                currentUser = { role: 'visitor', name: 'Pengunjung / Guru' };
-                sessionStorage.setItem('lcp_user', JSON.stringify(currentUser));
-                checkAuth();
+            if ((userInp === 'admin' && passInp === 'admin123') || (userInp === 'tamu' && passInp === 'tamu123')) {
+                document.getElementById('login-box-content').classList.add('hidden');
+                document.getElementById('login-loader').classList.remove('hidden');
+
+                setTimeout(() => {
+                    currentUser = userInp === 'admin' ? { role: 'admin', name: 'Operator Utama' } : { role: 'visitor', name: 'Pengunjung / Guru' };
+                    sessionStorage.setItem('lcp_user', JSON.stringify(currentUser));
+                    document.getElementById('login-box-content').classList.remove('hidden');
+                    document.getElementById('login-loader').classList.add('hidden');
+                    checkAuth();
+                }, 1200);
             } else {
                 showToast('Username atau Password salah!', 'error');
             }
@@ -567,7 +681,6 @@
             const targetTab = document.getElementById(tabId);
             if (targetTab) targetTab.classList.add('active');
 
-            // Update active bubble menu style
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-nav'));
             const activeBtn = document.getElementById('nav-' + tabId);
             if (activeBtn) activeBtn.classList.add('active-nav');
@@ -576,6 +689,10 @@
                 setTimeout(startScanner, 400);
             } else {
                 stopScanner();
+            }
+
+            if (tabId === 'dashboard') {
+                setTimeout(initCharts, 200);
             }
         }
 
@@ -588,14 +705,75 @@
             renderSchedules();
             renderHistory();
             updateStats();
+            
+            // Terapkan Pengaturan Visual
             document.getElementById('ui-banner-title').innerText = `Selamat Datang di ${settings.name}`;
             document.getElementById('ui-banner-subtitle').innerText = settings.banner;
+            document.getElementById('sidebar-title').innerHTML = settings.name.replace(' ', '<br>');
+            
+            if (settings.logoUrl) {
+                document.getElementById('sidebar-logo').src = settings.logoUrl;
+            }
+
+            const bannerBox = document.getElementById('dashboard-banner-box');
+            if (settings.bannerMode === 'custom' && settings.bannerUrl) {
+                bannerBox.style.backgroundImage = `linear-gradient(rgba(6,95,70,0.85), rgba(6,95,70,0.85)), url('${settings.bannerUrl}')`;
+            } else {
+                bannerBox.style.backgroundImage = 'none';
+            }
+
+            initCharts();
         }
 
         function updateStats() {
             document.getElementById('stat-total-aset').innerText = inventory.length;
             document.getElementById('stat-dipinjam').innerText = inventory.filter(i => i.status === 'Dipinjam').length;
             document.getElementById('stat-jadwal').innerText = schedules.length;
+            document.getElementById('dash-total-aset').innerText = inventory.length;
+            document.getElementById('dash-dipinjam').innerText = inventory.filter(i => i.status === 'Dipinjam').length;
+        }
+
+        function initCharts() {
+            const ctxAsset = document.getElementById('assetChart');
+            if (ctxAsset) {
+                if (assetChartInstance) assetChartInstance.destroy();
+                const tersediaCount = inventory.filter(i => i.status === 'Tersedia').length;
+                const dipinjamCount = inventory.filter(i => i.status === 'Dipinjam').length;
+
+                assetChartInstance = new Chart(ctxAsset, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Tersedia', 'Dipinjam'],
+                        datasets: [{
+                            data: [tersediaCount, dipinjamCount],
+                            backgroundColor: ['#10b981', '#f59e0b'],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            const ctxBorrow = document.getElementById('borrowChart');
+            if (ctxBorrow) {
+                if (borrowChartInstance) borrowChartInstance.destroy();
+                const totalSelesai = borrowHistory.filter(h => h.status === 'Selesai').length;
+                const totalAktif = borrowHistory.filter(h => h.status === 'Dipinjam').length;
+
+                borrowChartInstance = new Chart(ctxBorrow, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Selesai Dikembalikan', 'Aktif Dipinjam'],
+                        datasets: [{
+                            label: 'Jumlah Transaksi',
+                            data: [totalSelesai, totalAktif],
+                            backgroundColor: ['#059669', '#3b82f6'],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+                });
+            }
         }
 
         function renderInventory() {
@@ -603,7 +781,7 @@
             const tbody = document.getElementById('inventory-table-body');
             tbody.innerHTML = '';
 
-            const filtered = inventory.filter(i => i.name.toLowerCase().includes(query) || i.id.toLowerCase().includes(query));
+            const filtered = inventory.filter(i => (i.name && i.name.toLowerCase().includes(query)) || (i.id && i.id.toLowerCase().includes(query)));
             
             if (filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Tidak ada data inventaris</td></tr>`;
@@ -616,9 +794,9 @@
                 tr.innerHTML = `
                     <td class="p-4 font-mono text-xs font-bold text-brand-700">${item.id}</td>
                     <td class="p-4 font-medium">${item.name}</td>
-                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.condition === 'Baik' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${item.condition}</span></td>
-                    <td class="p-4 text-slate-500">${item.location}</td>
-                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.status === 'Tersedia' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${item.status}</span></td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.condition === 'Baik' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${item.condition || 'Baik'}</span></td>
+                    <td class="p-4 text-slate-500">${item.location || '-'}</td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.status === 'Tersedia' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${item.status || 'Tersedia'}</span></td>
                     <td class="p-4 text-center flex justify-center gap-2">
                         <button onclick="printQR('${item.id}')" class="p-2 text-slate-500 hover:text-brand-600 rounded-lg" title="Cetak QR"><i class="fa-solid fa-qrcode"></i></button>
                         <button onclick="openEditAssetModal('${item.id}')" class="admin-only ${currentUser?.role === 'admin' ? '' : 'hidden'} p-2 text-slate-500 hover:text-blue-600 rounded-lg" title="Edit"><i class="fa-solid fa-pen"></i></button>
@@ -663,12 +841,12 @@
                 if (!h.borrowDate || h.borrowDate === '-') return true;
                 if (mode === 'year') {
                     const yr = document.getElementById('filter-year').value;
-                    return h.borrowDate.startsWith(yr);
+                    return h.borrowDate.toString().startsWith(yr);
                 } else if (mode === 'range') {
                     const start = document.getElementById('filter-start').value;
                     const end = document.getElementById('filter-end').value;
                     if (!start || !end) return true;
-                    const itemDate = h.borrowDate.slice(0, 10);
+                    const itemDate = h.borrowDate.toString().slice(0, 10);
                     return itemDate >= start && itemDate <= end;
                 }
                 return true;
@@ -696,9 +874,8 @@
             const readerEl = document.getElementById('reader');
             if (!readerEl) return;
             
-            // Periksa apakah browser mendukung akses kamera (HTTPS / Localhost mandatory)
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                showToast('Browser memblokir kamera. Gunakan HTTPS atau localhost.', 'error');
+                showToast('Browser memblokir kamera. Gunakan HTTPS.', 'error');
                 return;
             }
 
@@ -722,20 +899,16 @@
                     qrCodeMessage => { handleScannedCode(qrCodeMessage); },
                     errorMessage => {}
                 ).catch(err => {
-                    console.log("Camera fallback to user:", err);
-                    // Coba kamera depan jika kamera belakang gagal
                     html5QrCode.start(
                         { facingMode: "user" },
                         config,
                         qrCodeMessage => { handleScannedCode(qrCodeMessage); },
                         errorMessage => {}
                     ).catch(err2 => {
-                        console.log("Camera error all:", err2);
-                        showToast('Gagal mengakses kamera. Periksa izin perangkat.', 'error');
+                        showToast('Gagal mengakses kamera.', 'error');
                     });
                 });
             } catch(e) { 
-                console.log(e);
                 showToast('Gagal memulai scanner.', 'error');
             }
         }
@@ -798,7 +971,7 @@
                 showToast('Aset berhasil dikembalikan!', 'success');
             }
             closeActionModal();
-            saveData();
+            syncToSheet();
             renderAll();
         }
 
@@ -859,9 +1032,9 @@
                 inventory.push({ id: newId, name, condition, location, status: 'Tersedia', borrower: '-', purpose: '-' });
             }
             closeAssetModal();
-            saveData();
+            syncToSheet();
             renderAll();
-            showToast('Data berhasil disimpan!', 'success');
+            showToast('Data berhasil disimpan ke Spreadsheet!', 'success');
         }
 
         function saveSchedule(e) {
@@ -875,7 +1048,7 @@
                 subject: document.getElementById('sch-subject').value
             });
             closeScheduleModal();
-            saveData();
+            syncToSheet();
             renderSchedules();
             updateStats();
             showToast('Jadwal ditambahkan', 'success');
@@ -884,7 +1057,7 @@
         function deleteAsset(id) {
             if (confirm('Hapus aset ini?')) {
                 inventory = inventory.filter(i => i.id !== id);
-                saveData();
+                syncToSheet();
                 renderAll();
                 showToast('Aset dihapus', 'success');
             }
@@ -893,7 +1066,7 @@
         function deleteSchedule(id) {
             if (confirm('Hapus jadwal ini?')) {
                 schedules = schedules.filter(s => s.id !== id);
-                saveData();
+                syncToSheet();
                 renderSchedules();
                 updateStats();
                 showToast('Jadwal dihapus', 'success');
@@ -903,8 +1076,46 @@
         function saveSettings() {
             settings.name = document.getElementById('setting-name').value;
             settings.banner = document.getElementById('setting-banner').value;
-            renderAll();
-            showToast('Pengaturan disimpan!', 'success');
+            settings.bannerMode = document.getElementById('setting-banner-mode').value;
+
+            const logoFile = document.getElementById('setting-logo-file').files[0];
+            const bannerFile = document.getElementById('setting-banner-file').files[0];
+
+            let pendingReads = 0;
+            const checkDone = () => {
+                pendingReads--;
+                if (pendingReads <= 0) {
+                    localStorage.setItem('lcp_settings', JSON.stringify(settings));
+                    renderAll();
+                    showToast('Pengaturan berhasil disimpan!', 'success');
+                }
+            };
+
+            if (logoFile) {
+                pendingReads++;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    settings.logoUrl = e.target.result;
+                    checkDone();
+                };
+                reader.readAsDataURL(logoFile);
+            }
+
+            if (bannerFile && settings.bannerMode === 'custom') {
+                pendingReads++;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    settings.bannerUrl = e.target.result;
+                    checkDone();
+                };
+                reader.readAsDataURL(bannerFile);
+            }
+
+            if (pendingReads === 0) {
+                localStorage.setItem('lcp_settings', JSON.stringify(settings));
+                renderAll();
+                showToast('Pengaturan berhasil disimpan!', 'success');
+            }
         }
 
         function printQR(id) {
