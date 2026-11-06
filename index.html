@@ -212,7 +212,7 @@
                     </button>
                     <div class="hidden md:flex items-center gap-2 text-slate-500 font-medium">
                         <i class="fa-solid fa-building-columns text-brand-600"></i>
-                        <span>Lab: <span id="header-lab">Komputer Putra</span></span>
+                        <span>Lab: <span id="Computer Putra">1312350120069</span></span>
                     </div>
                     <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
                     <div class="flex items-center gap-2 text-slate-700 font-bold">
@@ -601,10 +601,6 @@
 
         let currentUser = null;
         
-        // PERBAIKAN DEFAULT SETTING: Saya ubah tulisan aslinya (bawaan) menjadi yang Abang ketik di Laptop.
-        // Penjelasan: Pengaturan ini tersimpan di "Memori Browser" (Local Storage) HP / Laptop masing-masing
-        // agar loading gambar logo sangat cepat. Karena default kodenya sudah diganti di sini,
-        // saat buka di HP nanti akan langsung muncul tulisan ini!
         let settings = JSON.parse(localStorage.getItem('lcp_settings')) || { 
             name: "Lab Komputer Putra", 
             bannerTitle: "Selamat Datang di Lab Komputer Putra PP Wali Songo",
@@ -691,14 +687,12 @@
                     
                     if (result.settings) {
                         settings = result.settings;
-                        // Timpa input form di pengaturan agar sesuai dengan dari server
                         if(document.getElementById('setting-name')) document.getElementById('setting-name').value = settings.name || "";
                         if(document.getElementById('setting-banner-title')) document.getElementById('setting-banner-title').value = settings.bannerTitle || "";
                         if(document.getElementById('setting-banner')) document.getElementById('setting-banner').value = settings.banner || "";
                         if(document.getElementById('setting-banner-mode')) document.getElementById('setting-banner-mode').value = settings.bannerMode || "default";
                     }
 
-                    // Simpan data terbaru ke cache
                     localStorage.setItem('lcp_settings', JSON.stringify(settings));
                     localStorage.setItem('lcp_users', JSON.stringify(usersData));
                     localStorage.setItem('lcp_inventory', JSON.stringify(inventory));
@@ -713,7 +707,6 @@
         }
 
         async function syncToSheet() {
-            // Update cache lokal dulu supaya UI cepat
             localStorage.setItem('lcp_inventory', JSON.stringify(inventory));
             localStorage.setItem('lcp_schedules', JSON.stringify(schedules));
             localStorage.setItem('lcp_history', JSON.stringify(borrowHistory));
@@ -747,7 +740,6 @@
                 appWrapper.classList.remove('hidden');
                 applyPermissions();
                 
-                // Ambil update terbaru di background (termasuk cek update password dari spreadsheet)
                 fetchSheetData();
                 renderAll();
                 switchTab('dashboard');
@@ -755,7 +747,6 @@
                 loginOverlay.classList.remove('hidden');
                 appWrapper.classList.add('hidden');
                 
-                // Ambil data users terbaru di background buat persiapan login
                 fetchSheetData(); 
 
                 if (settings.logoUrl) {
@@ -991,7 +982,8 @@
                     <td class="p-4">${sch.teacher}</td>
                     <td class="p-4">${sch.subject}</td>
                     <td class="p-4 text-center admin-only ${currentUser?.role === 'admin' ? '' : 'hidden'}">
-                        <button onclick="deleteSchedule(${sch.id})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                        <!-- PERBAIKAN BUG: Menambahkan tanda kutip tunggal '' pada sch.id -->
+                        <button onclick="deleteSchedule('${sch.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1245,7 +1237,7 @@
         async function saveSchedule(e) {
             e.preventDefault();
             schedules.push({
-                id: Date.now(),
+                id: Date.now().toString(),
                 date: document.getElementById('sch-date').value,
                 start: document.getElementById('sch-start').value,
                 end: document.getElementById('sch-end').value,
@@ -1264,7 +1256,8 @@
 
         async function deleteAsset(id) {
             if (confirm('Hapus aset ini?')) {
-                inventory = inventory.filter(i => i.id !== id);
+                // BUG FIX: Ensure both are treated as strings
+                inventory = inventory.filter(i => String(i.id) !== String(id));
                 showGlobalLoader("Menghapus Data Aset...");
                 await syncToSheet();
                 renderAll();
@@ -1275,7 +1268,8 @@
 
         async function deleteSchedule(id) {
             if (confirm('Hapus jadwal ini?')) {
-                schedules = schedules.filter(s => s.id !== id);
+                // BUG FIX: Ensure both are treated as strings to avoid type mismatch
+                schedules = schedules.filter(s => String(s.id) !== String(id));
                 showGlobalLoader("Menghapus Jadwal...");
                 await syncToSheet();
                 renderSchedules();
@@ -1301,7 +1295,7 @@
                         canvas.width = width;
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
-                        ctx.fillStyle = "#ffffff"; // background putih agar tidak transparan jadi hitam
+                        ctx.fillStyle = "#ffffff";
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         resolve(canvas.toDataURL('image/jpeg', quality));
@@ -1323,7 +1317,6 @@
 
             showGlobalLoader("Menyimpan Pengaturan ke Server...");
 
-            // Compress image to Base64 (max 50,000 char untuk limit Google Sheets)
             if (logoFile) {
                 settings.logoUrl = await compressImage(logoFile, 200, 0.7);
             }
@@ -1332,7 +1325,7 @@
             }
 
             localStorage.setItem('lcp_settings', JSON.stringify(settings));
-            await syncToSheet(); // Sekarang pengaturan dikirim ke Spreadsheet Server!
+            await syncToSheet();
             
             renderAll();
             hideGlobalLoader();
@@ -1395,7 +1388,6 @@
             
             container.appendChild(toast);
             
-            // Animate In
             setTimeout(() => {
                 toast.classList.remove('translate-y-[-20px]', 'opacity-0');
             }, 10);
