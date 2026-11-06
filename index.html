@@ -85,7 +85,16 @@
 <body class="text-slate-800 h-screen overflow-hidden bg-slate-50">
 
     <!-- TOAST NOTIFICATION CONTAINER -->
-    <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-2"></div>
+    <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- GLOBAL LOADER (For Save/Sync Action) -->
+    <div id="global-loader" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-3xl p-8 flex flex-col items-center justify-center shadow-2xl max-w-sm w-full text-center scale-95 transform transition-transform">
+            <div class="w-14 h-14 border-4 border-brand-100 border-t-brand-600 rounded-full animate-spin mb-4 mx-auto"></div>
+            <h3 class="text-xl font-bold text-slate-800" id="global-loader-title">Memproses Data</h3>
+            <p class="text-sm text-slate-500 mt-2">Mohon tunggu sebentar...</p>
+        </div>
+    </div>
 
     <!-- LOGIN OVERLAY WITH LOADER ANIMATION -->
     <div id="login-overlay" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
@@ -197,7 +206,10 @@
                         <span>Tahun Ajaran: 2026/2027 - Ganjil</span>
                     </div>
                 </div>
-                <div class="flex items-center gap-6 text-sm">
+                <div class="flex items-center gap-4 sm:gap-6 text-sm">
+                    <button onclick="manualSync()" class="flex items-center gap-2 bg-brand-50 hover:bg-brand-100 text-brand-700 px-3 py-1.5 rounded-full font-bold transition-colors border border-brand-200 shadow-sm" title="Tarik Data Terbaru dari Spreadsheet">
+                        <i class="fa-solid fa-sync-alt"></i> <span class="hidden sm:inline-block text-xs">Refresh Data</span>
+                    </button>
                     <div class="hidden md:flex items-center gap-2 text-slate-500 font-medium">
                         <i class="fa-solid fa-building-columns text-brand-600"></i>
                         <span>NSM: <span id="header-nsm">1312350120069</span></span>
@@ -302,7 +314,7 @@
                         <div class="p-4 border-b border-slate-100 flex gap-4">
                             <div class="relative flex-1">
                                 <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
-                                <input type="text" id="search-inventory" oninput="renderInventory()" placeholder="Cari kode atau nama aset..." class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-brand-500">
+                                <input type="text" id="search-inventory" oninput="renderInventory(true)" placeholder="Cari kode atau nama aset..." class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-brand-500">
                             </div>
                         </div>
                         <div class="overflow-x-auto">
@@ -320,6 +332,7 @@
                                 <tbody id="inventory-table-body" class="divide-y divide-slate-100"></tbody>
                             </table>
                         </div>
+                        <div id="inventory-pagination" class="p-4 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-center text-sm gap-4"></div>
                     </div>
                 </section>
 
@@ -376,6 +389,7 @@
                             </thead>
                             <tbody id="schedule-table-body" class="divide-y divide-slate-100"></tbody>
                         </table>
+                        <div id="schedule-pagination" class="p-4 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-center text-sm gap-4"></div>
                     </div>
                 </section>
 
@@ -408,7 +422,7 @@
                         </div>
                         <div id="filter-year-box" class="hidden">
                             <label class="block text-xs font-semibold text-slate-500 mb-1">Pilih Tahun</label>
-                            <select id="filter-year" onchange="renderHistory()" class="px-3 py-2 border rounded-xl text-sm bg-slate-50">
+                            <select id="filter-year" onchange="renderHistory(true)" class="px-3 py-2 border rounded-xl text-sm bg-slate-50">
                                 <option value="2026">2026</option>
                                 <option value="2027">2027</option>
                                 <option value="2028">2028</option>
@@ -417,11 +431,11 @@
                         <div id="filter-date-box" class="hidden flex gap-2">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">Dari Tanggal</label>
-                                <input type="date" id="filter-start" onchange="renderHistory()" class="px-3 py-2 border rounded-xl text-sm bg-slate-50">
+                                <input type="date" id="filter-start" onchange="renderHistory(true)" class="px-3 py-2 border rounded-xl text-sm bg-slate-50">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">Sampai Tanggal</label>
-                                <input type="date" id="filter-end" onchange="renderHistory()" class="px-3 py-2 border rounded-xl text-sm bg-slate-50">
+                                <input type="date" id="filter-end" onchange="renderHistory(true)" class="px-3 py-2 border rounded-xl text-sm bg-slate-50">
                             </div>
                         </div>
                     </div>
@@ -438,6 +452,7 @@
                             </thead>
                             <tbody id="history-table-body" class="divide-y divide-slate-100"></tbody>
                         </table>
+                        <div id="history-pagination" class="p-4 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-center text-sm gap-4"></div>
                     </div>
                 </section>
 
@@ -599,6 +614,57 @@
 
         let assetChartInstance = null;
         let borrowChartInstance = null;
+
+        // Pagination State
+        let currentPageInventory = 1;
+        let currentPageSchedule = 1;
+        let currentPageHistory = 1;
+        const itemsPerPage = 10;
+
+        function showGlobalLoader(title = "Memproses Data") {
+            document.getElementById('global-loader-title').innerText = title;
+            document.getElementById('global-loader').classList.remove('hidden');
+        }
+
+        function hideGlobalLoader() {
+            document.getElementById('global-loader').classList.add('hidden');
+        }
+
+        async function manualSync() {
+            showGlobalLoader("Menarik Data dari Excel...");
+            await fetchSheetData();
+            hideGlobalLoader();
+            showToast("Berhasil! Data terbaru telah dimuat.", "success");
+        }
+
+        function buildPagination(totalItems, currentPage, containerId, callbackName) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            if (totalItems <= 0) { container.innerHTML = ''; return; }
+            
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+            let html = `<div class="text-slate-500">Menampilkan <b>${Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}</b> - <b>${Math.min(currentPage * itemsPerPage, totalItems)}</b> dari <b>${totalItems}</b> data</div>`;
+            
+            html += `<div class="flex gap-1">`;
+            html += `<button onclick="${callbackName}(${currentPage - 1})" class="px-3 py-1.5 rounded-lg border ${currentPage === 1 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white text-slate-700 hover:bg-brand-50 hover:text-brand-600 hover:border-brand-200'}" ${currentPage === 1 ? 'disabled' : ''}><i class="fa-solid fa-chevron-left"></i></button>`;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    html += `<button onclick="${callbackName}(${i})" class="px-3 py-1.5 rounded-lg border font-medium ${currentPage === i ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-700 hover:bg-brand-50 hover:text-brand-600 hover:border-brand-200'}">${i}</button>`;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    html += `<span class="px-2 py-1.5 text-slate-400">...</span>`;
+                }
+            }
+            
+            html += `<button onclick="${callbackName}(${currentPage + 1})" class="px-3 py-1.5 rounded-lg border ${currentPage === totalPages ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white text-slate-700 hover:bg-brand-50 hover:text-brand-600 hover:border-brand-200'}" ${currentPage === totalPages ? 'disabled' : ''}><i class="fa-solid fa-chevron-right"></i></button>`;
+            html += `</div>`;
+            
+            container.innerHTML = html;
+        }
+
+        function changePageInventory(page) { currentPageInventory = page; renderInventory(); }
+        function changePageSchedule(page) { currentPageSchedule = page; renderSchedules(); }
+        function changePageHistory(page) { currentPageHistory = page; renderHistory(); }
 
         // Fetch data background dari Google Sheets
         async function fetchSheetData() {
@@ -837,7 +903,8 @@
             }
         }
 
-        function renderInventory() {
+        function renderInventory(resetPage = false) {
+            if (resetPage) currentPageInventory = 1;
             const query = document.getElementById('search-inventory').value.toLowerCase();
             const tbody = document.getElementById('inventory-table-body');
             tbody.innerHTML = '';
@@ -846,10 +913,14 @@
             
             if (filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Tidak ada data inventaris</td></tr>`;
+                document.getElementById('inventory-pagination').innerHTML = '';
                 return;
             }
 
-            filtered.forEach(item => {
+            const start = (currentPageInventory - 1) * itemsPerPage;
+            const paginated = filtered.slice(start, start + itemsPerPage);
+
+            paginated.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50/50";
                 tr.innerHTML = `
@@ -866,12 +937,25 @@
                 `;
                 tbody.appendChild(tr);
             });
+            
+            buildPagination(filtered.length, currentPageInventory, 'inventory-pagination', 'changePageInventory');
         }
 
-        function renderSchedules() {
+        function renderSchedules(resetPage = false) {
+            if (resetPage) currentPageSchedule = 1;
             const tbody = document.getElementById('schedule-table-body');
             tbody.innerHTML = '';
-            schedules.forEach(sch => {
+            
+            if (schedules.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Tidak ada data jadwal</td></tr>`;
+                document.getElementById('schedule-pagination').innerHTML = '';
+                return;
+            }
+
+            const start = (currentPageSchedule - 1) * itemsPerPage;
+            const paginated = schedules.slice(start, start + itemsPerPage);
+
+            paginated.forEach(sch => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="p-4 font-medium">${sch.date}</td>
@@ -884,16 +968,20 @@
                 `;
                 tbody.appendChild(tr);
             });
+            
+            buildPagination(schedules.length, currentPageSchedule, 'schedule-pagination', 'changePageSchedule');
         }
 
         function toggleReportMode() {
+            currentPageHistory = 1;
             const mode = document.getElementById('report-mode').value;
             document.getElementById('filter-year-box').classList.toggle('hidden', mode !== 'year');
             document.getElementById('filter-date-box').classList.toggle('hidden', mode !== 'range');
-            renderHistory();
+            renderHistory(true);
         }
 
-        function renderHistory() {
+        function renderHistory(resetPage = false) {
+            if (resetPage) currentPageHistory = 1;
             const mode = document.getElementById('report-mode').value;
             const tbody = document.getElementById('history-table-body');
             tbody.innerHTML = '';
@@ -915,10 +1003,14 @@
 
             if (filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400">Tidak ada data riwayat</td></tr>`;
+                document.getElementById('history-pagination').innerHTML = '';
                 return;
             }
+            
+            const start = (currentPageHistory - 1) * itemsPerPage;
+            const paginated = filtered.slice(start, start + itemsPerPage);
 
-            filtered.forEach(h => {
+            paginated.forEach(h => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="p-4 text-xs">${h.borrowDate}</td>
@@ -928,6 +1020,8 @@
                 `;
                 tbody.appendChild(tr);
             });
+            
+            buildPagination(filtered.length, currentPageHistory, 'history-pagination', 'changePageHistory');
         }
 
         let html5QrCode = null;
@@ -1013,11 +1107,13 @@
             document.getElementById('modal-action').classList.remove('hidden');
         }
 
-        function processBorrowAction(e) {
+        async function processBorrowAction(e) {
             e.preventDefault();
             const id = document.getElementById('action-asset-id').value;
             const type = document.getElementById('action-type').value;
             const asset = inventory.find(i => i.id === id);
+            
+            showGlobalLoader(type === 'borrow' ? "Memproses Peminjaman..." : "Memproses Pengembalian...");
 
             if (type === 'borrow') {
                 const borrower = document.getElementById('borrower-name').value;
@@ -1045,11 +1141,12 @@
                     hist.status = 'Selesai';
                     hist.returnDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
                 }
-                showToast('Aset berhasil dikembalikan!', 'success');
             }
             closeActionModal();
-            syncToSheet();
+            await syncToSheet();
             renderAll();
+            hideGlobalLoader();
+            showToast(type === 'borrow' ? 'Aset berhasil dipinjam!' : 'Aset berhasil dikembalikan!', 'success');
         }
 
         function openAddAssetModal() {
@@ -1078,7 +1175,7 @@
         function openAddScheduleModal() { document.getElementById('modal-schedule').classList.remove('hidden'); }
         function closeScheduleModal() { document.getElementById('modal-schedule').classList.add('hidden'); }
 
-        function saveAsset(e) {
+        async function saveAsset(e) {
             e.preventDefault();
             const oldId = document.getElementById('edit-old-id').value;
             const newId = document.getElementById('asset-id').value.trim();
@@ -1109,12 +1206,15 @@
                 inventory.push({ id: newId, name, condition, location, status: 'Tersedia', borrower: '-', purpose: '-' });
             }
             closeAssetModal();
-            syncToSheet();
+            
+            showGlobalLoader("Menyimpan Aset ke Spreadsheet...");
+            await syncToSheet();
             renderAll();
+            hideGlobalLoader();
             showToast('Data berhasil disimpan ke Spreadsheet!', 'success');
         }
 
-        function saveSchedule(e) {
+        async function saveSchedule(e) {
             e.preventDefault();
             schedules.push({
                 id: Date.now(),
@@ -1125,28 +1225,35 @@
                 subject: document.getElementById('sch-subject').value
             });
             closeScheduleModal();
-            syncToSheet();
+            
+            showGlobalLoader("Menyimpan Jadwal...");
+            await syncToSheet();
             renderSchedules();
             updateStats();
-            showToast('Jadwal ditambahkan', 'success');
+            hideGlobalLoader();
+            showToast('Jadwal berhasil ditambahkan!', 'success');
         }
 
-        function deleteAsset(id) {
+        async function deleteAsset(id) {
             if (confirm('Hapus aset ini?')) {
                 inventory = inventory.filter(i => i.id !== id);
-                syncToSheet();
+                showGlobalLoader("Menghapus Data Aset...");
+                await syncToSheet();
                 renderAll();
-                showToast('Aset dihapus', 'success');
+                hideGlobalLoader();
+                showToast('Aset berhasil dihapus!', 'success');
             }
         }
 
-        function deleteSchedule(id) {
+        async function deleteSchedule(id) {
             if (confirm('Hapus jadwal ini?')) {
                 schedules = schedules.filter(s => s.id !== id);
-                syncToSheet();
+                showGlobalLoader("Menghapus Jadwal...");
+                await syncToSheet();
                 renderSchedules();
                 updateStats();
-                showToast('Jadwal dihapus', 'success');
+                hideGlobalLoader();
+                showToast('Jadwal berhasil dihapus!', 'success');
             }
         }
 
@@ -1246,11 +1353,19 @@
         function showToast(msg, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `px-4 py-3 rounded-xl text-white font-medium text-sm shadow-lg ${type === 'success' ? 'bg-emerald-600' : 'bg-red-600'} transition-all transform duration-300`;
-            toast.innerText = msg;
+            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check mr-2 text-lg"></i>' : '<i class="fa-solid fa-triangle-exclamation mr-2 text-lg"></i>';
+            toast.className = `px-5 py-4 rounded-xl text-white font-medium text-sm shadow-xl ${type === 'success' ? 'bg-brand-600' : 'bg-red-600'} transition-all transform duration-300 flex items-center translate-y-[-20px] opacity-0`;
+            toast.innerHTML = `${icon} <span>${msg}</span>`;
+            
             container.appendChild(toast);
+            
+            // Animate In
             setTimeout(() => {
-                toast.style.opacity = '0';
+                toast.classList.remove('translate-y-[-20px]', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'scale-95');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
