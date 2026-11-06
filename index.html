@@ -104,7 +104,7 @@
                     <div class="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-100 shadow-inner">
                         <i class="fa-solid fa-microchip text-4xl text-brand-600"></i>
                     </div>
-                    <h1 id="login-title" class="text-2xl font-bold text-slate-800">LABCOMPT PUTRA</h1>
+                    <h1 id="login-title" class="text-2xl font-bold text-slate-800">Lab Komputer Putra</h1>
                     <p class="text-slate-500 text-sm mt-1">Pusat Layanan Laboratorium Komputer Terpadu</p>
                 </div>
                 
@@ -149,14 +149,14 @@
             <div class="p-6 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <img id="sidebar-logo" src="https://placehold.co/100x100/ffffff/0a4a35?text=LCP" alt="Logo" class="w-10 h-10 rounded-full object-cover bg-white p-1 shadow">
-                    <h1 class="text-lg font-bold tracking-tight leading-tight" id="sidebar-title">LABCOMPT<br>PUTRA</h1>
+                    <h1 class="text-lg font-bold tracking-tight leading-tight" id="sidebar-title">Lab Komputer<br>Putra</h1>
                 </div>
                 <button class="md:hidden text-brand-300 hover:text-white" onclick="toggleSidebar()">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
             </div>
             
-            <nav class="flex-1 mt-2 space-y-1 py-2 cursor-pointer">
+            <nav class="flex-1 mt-2 space-y-1 py-2 cursor-pointer overflow-y-auto">
                 <button id="nav-dashboard" onclick="switchTab('dashboard')" class="nav-btn active-nav flex items-center gap-3 px-4 py-3 text-brand-100">
                     <i class="fa-solid fa-chart-pie w-5"></i>
                     <span class="font-medium text-sm">Dashboard</span>
@@ -229,11 +229,11 @@
                 <section id="dashboard" class="tab-content max-w-6xl mx-auto space-y-6">
                     <!-- Banner Full Seamless Tanpa Background Kotak Dalam -->
                     <div id="dashboard-banner-box" class="bg-brand-800 text-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-lg relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-cover bg-center">
-                        <div class="relative z-15 w-full md:w-auto">
-                            <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-1" id="ui-banner-title">Selamat Datang di LABCOMPT PUTRA</h2>
-                            <p class="text-brand-200 text-xs sm:text-sm md:text-base opacity-90" id="ui-banner-subtitle">Pusat Komputer dan Teknologi Informasi</p>
+                        <div class="relative z-10 w-full md:w-auto">
+                            <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-1" id="ui-banner-title">Selamat Datang di Lab Komputer Putra PP Wali Songo</h2>
+                            <p class="text-brand-200 text-xs sm:text-sm md:text-base opacity-90" id="ui-banner-subtitle">Tanamkan Tanggung Jawab, Disiplin, Kerapian, Kebersihan untuk mencetak SDM yang Lebih Baik</p>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 flex items-center justify-center gap-4 text-center relative z-15 w-full md:w-auto">
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 flex items-center justify-center gap-4 text-center relative z-10 w-full md:w-auto">
                             <div>
                                 <p class="text-xs text-brand-200">Total Aset</p>
                                 <p class="text-xl sm:text-2xl font-bold text-white" id="dash-total-aset">0</p>
@@ -317,8 +317,9 @@
                                 <input type="text" id="search-inventory" oninput="renderInventory(true)" placeholder="Cari kode atau nama aset..." class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-brand-500">
                             </div>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-sm">
+                        <!-- PERBAIKAN: Membungkus dengan overflow-x-auto dan mengatur min-width agar bisa digeser di HP -->
+                        <div class="overflow-x-auto w-full">
+                            <table class="w-full text-left border-collapse text-sm whitespace-nowrap min-w-[750px]">
                                 <thead>
                                     <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
                                         <th class="p-4">Kode Aset</th>
@@ -377,18 +378,21 @@
                         </button>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
-                                    <th class="p-4">Hari / Tanggal</th>
-                                    <th class="p-4">Waktu</th>
-                                    <th class="p-4">Guru / Penanggung Jawab</th>
-                                    <th class="p-4">Mata Pelajaran / Kegiatan</th>
-                                    <th class="p-4 text-center admin-only hidden">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="schedule-table-body" class="divide-y divide-slate-100"></tbody>
-                        </table>
+                        <!-- PERBAIKAN: Membungkus dengan overflow-x-auto dan mengatur min-width agar bisa digeser di HP -->
+                        <div class="overflow-x-auto w-full">
+                            <table class="w-full text-left border-collapse text-sm whitespace-nowrap min-w-[700px]">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
+                                        <th class="p-4">Hari / Tanggal</th>
+                                        <th class="p-4">Waktu</th>
+                                        <th class="p-4">Guru / Penanggung Jawab</th>
+                                        <th class="p-4">Mata Pelajaran / Kegiatan</th>
+                                        <th class="p-4 text-center admin-only hidden">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="schedule-table-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
                         <div id="schedule-pagination" class="p-4 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-center text-sm gap-4"></div>
                     </div>
                 </section>
@@ -441,17 +445,20 @@
                     </div>
 
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
-                                    <th class="p-4">Waktu Peminjaman</th>
-                                    <th class="p-4">Aset Dipinjam</th>
-                                    <th class="p-4">Peminjam</th>
-                                    <th class="p-4">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="history-table-body" class="divide-y divide-slate-100"></tbody>
-                        </table>
+                        <!-- PERBAIKAN: Membungkus dengan overflow-x-auto dan mengatur min-width agar bisa digeser di HP -->
+                        <div class="overflow-x-auto w-full">
+                            <table class="w-full text-left border-collapse text-sm whitespace-nowrap min-w-[650px]">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
+                                        <th class="p-4">Waktu Peminjaman</th>
+                                        <th class="p-4">Aset Dipinjam</th>
+                                        <th class="p-4">Peminjam</th>
+                                        <th class="p-4">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-table-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
                         <div id="history-pagination" class="p-4 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-center text-sm gap-4"></div>
                     </div>
                 </section>
@@ -465,15 +472,15 @@
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Judul / Sapaan Banner (Contoh: Selamat Datang di...)</label>
-                            <input type="text" id="setting-banner-title" value="Selamat Datang di LABCOMPT PUTRA" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
+                            <input type="text" id="setting-banner-title" value="Selamat Datang di Lab Komputer Putra PP Wali Songo" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Sub-Teks Banner</label>
-                            <input type="text" id="setting-banner" value="Pusat Komputer dan Teknologi Informasi" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
+                            <input type="text" id="setting-banner" value="Tanamkan Tanggung Jawab, Disiplin, Kerapian, Kebersihan untuk mencetak SDM yang Lebih Baik" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Nama Laboratorium (Teks Sistem)</label>
-                            <input type="text" id="setting-name" value="LABCOMPT PUTRA" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
+                            <input type="text" id="setting-name" value="Lab Komputer Putra" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Upload Logo Aplikasi (Sidebar, Login & Tab Browser)</label>
@@ -593,10 +600,15 @@
         const API_URL = "https://script.google.com/macros/s/AKfycby_COVhJB0NqneA3vAxj82GRBMnIKQ4jw6ODssAv0t2gYPpkcIQD1ro5QDDuvr_QuW4zA/exec";
 
         let currentUser = null;
+        
+        // PERBAIKAN DEFAULT SETTING: Saya ubah tulisan aslinya (bawaan) menjadi yang Abang ketik di Laptop.
+        // Penjelasan: Pengaturan ini tersimpan di "Memori Browser" (Local Storage) HP / Laptop masing-masing
+        // agar loading gambar logo sangat cepat. Karena default kodenya sudah diganti di sini,
+        // saat buka di HP nanti akan langsung muncul tulisan ini!
         let settings = JSON.parse(localStorage.getItem('lcp_settings')) || { 
-            name: "LABCOMPT PUTRA", 
-            bannerTitle: "Selamat Datang di LABCOMPT PUTRA",
-            banner: "Pusat Komputer dan Teknologi Informasi",
+            name: "Lab Komputer Putra", 
+            bannerTitle: "Selamat Datang di Lab Komputer Putra PP Wali Songo",
+            banner: "Tanamkan Tanggung Jawab, Disiplin, Kerapian, Kebersihan untuk mencetak SDM yang Lebih Baik",
             logoUrl: "https://placehold.co/100x100/ffffff/0a4a35?text=LCP",
             bannerMode: "default",
             bannerUrl: ""
@@ -706,7 +718,6 @@
                         inventory: inventory,
                         schedules: schedules,
                         borrowHistory: borrowHistory
-                        // Note: Kita tidak sync Users dari UI karena edit Users dilakukan langsung di Spreadsheet
                     })
                 });
             } catch (e) {
@@ -743,7 +754,7 @@
                     }
                 }
                 const loginTitle = document.getElementById('login-title');
-                if (loginTitle) loginTitle.innerText = settings.name || "LABCOMPT PUTRA";
+                if (loginTitle) loginTitle.innerText = settings.name || "Lab Komputer Putra";
             }
         }
 
@@ -760,8 +771,6 @@
             document.getElementById('login-loader').classList.remove('hidden');
 
             setTimeout(() => {
-                // PENGECEKAN DINAMIS: Mencari user di dalam cache yang disinkron dari Spreadsheet
-                // Menggunakan '==' (bukan '===') supaya angka/teks dari spreadsheet tetap terbaca cocok
                 const matchedUser = usersData.find(u => u.username == userInp && u.password == passInp);
 
                 if (matchedUser) {
@@ -830,16 +839,15 @@
             renderHistory();
             updateStats();
             
-            document.getElementById('ui-banner-title').innerText = settings.bannerTitle || "Selamat Datang di LABCOMPT PUTRA";
+            document.getElementById('ui-banner-title').innerText = settings.bannerTitle || "Selamat Datang di Lab Komputer Putra PP Wali Songo";
             document.getElementById('ui-banner-subtitle').innerText = settings.banner;
             
-            // Perbaikan: Memastikan Nama Lab berubah dinamis mengikuti input pengaturan
-            document.getElementById('sidebar-title').innerText = settings.name || "LABCOMPT PUTRA";
+            document.getElementById('sidebar-title').innerText = settings.name || "Lab Komputer Putra";
             
             const loginTitle = document.getElementById('login-title');
-            if (loginTitle) loginTitle.innerText = settings.name || "LABCOMPT PUTRA";
+            if (loginTitle) loginTitle.innerText = settings.name || "Lab Komputer Putra";
 
-            document.title = (settings.name || "LABCOMPT PUTRA") + " - Manajemen Lab Terpadu";
+            document.title = (settings.name || "Lab Komputer Putra") + " - Manajemen Lab Terpadu";
             
             if (settings.logoUrl) {
                 document.getElementById('sidebar-logo').src = settings.logoUrl;
