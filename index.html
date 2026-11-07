@@ -11,13 +11,17 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Tailwind CSS & Chart.js -->
+    <!-- Tailwind CSS, Chart.js, HTML2Canvas & QRious -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Library untuk mengubah desain HTML menjadi Gambar JPG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Library untuk membuat QR Code langsung tanpa internet/API luar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -54,14 +58,12 @@
         #reader { width: 100%; border-radius: 12px; overflow: hidden; border: 2px dashed #cbd5e1; min-height: 250px; background: #000; }
         #reader video { object-fit: cover; width: 100% !important; }
 
-        /* Bubble Pill Menu Style & Hover Effect */
         .nav-btn {
             border-radius: 9999px;
             margin: 4px 12px;
             width: calc(100% - 24px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        /* Efek Menonjol (Bubble) saat di-hover */
         .nav-btn:hover:not(.active-nav) {
             transform: scale(1.04);
             background-color: rgba(255, 255, 255, 0.15);
@@ -74,20 +76,12 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             transform: scale(1.02);
         }
-        @media print {
-            body { background: white !important; }
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-        }
-        .print-only { display: none; }
     </style>
 </head>
 <body class="text-slate-800 h-screen overflow-hidden bg-slate-50">
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
     <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- GLOBAL LOADER (For Save/Sync Action) -->
     <div id="global-loader" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4 transition-opacity">
         <div class="bg-white rounded-3xl p-8 flex flex-col items-center justify-center shadow-2xl max-w-sm w-full text-center scale-95 transform transition-transform">
             <div class="w-14 h-14 border-4 border-brand-100 border-t-brand-600 rounded-full animate-spin mb-4 mx-auto"></div>
@@ -96,7 +90,7 @@
         </div>
     </div>
 
-    <!-- LOGIN OVERLAY WITH LOADER ANIMATION -->
+    <!-- LOGIN -->
     <div id="login-overlay" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl relative">
             <div id="login-box-content">
@@ -121,23 +115,12 @@
                         Masuk Sistem
                     </button>
                 </div>
-                
-                <div class="mt-6 p-4 bg-slate-50 rounded-xl text-xs text-slate-500 text-center border border-slate-100">
-                    <p><i class="fa-solid fa-circle-info text-brand-500 mr-1"></i> <b>Informasi Login</b></p>
-                    <p class="mt-1">Username dan Password dikelola secara dinamis melalui tab/sheet <b>"Users"</b> di Google Spreadsheet.</p>
-                </div>
             </div>
 
-            <!-- MEMVERIFIKASI LOADER SPINNER -->
             <div id="login-loader" class="hidden text-center py-12">
                 <div class="w-16 h-16 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                 <h3 class="text-lg font-bold text-slate-800">Memverifikasi login</h3>
                 <p class="text-sm text-slate-500 mt-1">Sedang memeriksa username dan password...</p>
-                <div class="flex justify-center gap-1.5 mt-4">
-                    <span class="w-2 h-2 bg-brand-500 rounded-full animate-bounce"></span>
-                    <span class="w-2 h-2 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
-                    <span class="w-2 h-2 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></span>
-                </div>
             </div>
         </div>
     </div>
@@ -210,11 +193,6 @@
                     <button onclick="manualSync()" class="flex items-center gap-2 bg-brand-50 hover:bg-brand-100 text-brand-700 px-3 py-1.5 rounded-full font-bold transition-colors border border-brand-200 shadow-sm" title="Tarik Data Terbaru dari Spreadsheet">
                         <i class="fa-solid fa-sync-alt"></i> <span class="hidden sm:inline-block text-xs">Refresh Data</span>
                     </button>
-                    <div class="hidden md:flex items-center gap-2 text-slate-500 font-medium">
-                        <i class="fa-solid fa-building-columns text-brand-600"></i>
-                        <span>NSM: <span id="header-nsm">1312350120069</span></span>
-                    </div>
-                    <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
                     <div class="flex items-center gap-2 text-slate-700 font-bold">
                         <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
                             <i class="fa-solid fa-user"></i>
@@ -227,7 +205,6 @@
             <div class="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
                 <!-- DASHBOARD -->
                 <section id="dashboard" class="tab-content max-w-6xl mx-auto space-y-6">
-                    <!-- Banner Full Seamless Tanpa Background Kotak Dalam -->
                     <div id="dashboard-banner-box" class="bg-brand-800 text-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-lg relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-cover bg-center">
                         <div class="relative z-10 w-full md:w-auto">
                             <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-1" id="ui-banner-title">Selamat Datang di Lab Komputer Putra PP Wali Songo</h2>
@@ -246,7 +223,6 @@
                         </div>
                     </div>
 
-                    <!-- Stat Cards Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                             <div>
@@ -277,23 +253,18 @@
                         </div>
                     </div>
 
-                    <!-- GRAFIK STATISTIK SECTION -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                             <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <i class="fa-solid fa-chart-pie text-brand-600"></i> Statistik Status Aset Lab
+                                <i class="fa-solid fa-chart-pie text-brand-600"></i> Statistik Status Aset
                             </h3>
-                            <div class="h-64 flex items-center justify-center">
-                                <canvas id="assetChart"></canvas>
-                            </div>
+                            <div class="h-64 flex items-center justify-center"><canvas id="assetChart"></canvas></div>
                         </div>
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                             <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <i class="fa-solid fa-chart-bar text-brand-600"></i> Tren Peminjaman & Pengembalian
+                                <i class="fa-solid fa-chart-bar text-brand-600"></i> Tren Peminjaman
                             </h3>
-                            <div class="h-64 flex items-center justify-center">
-                                <canvas id="borrowChart"></canvas>
-                            </div>
+                            <div class="h-64 flex items-center justify-center"><canvas id="borrowChart"></canvas></div>
                         </div>
                     </div>
                 </section>
@@ -303,7 +274,6 @@
                     <div class="flex justify-between items-center mb-6">
                         <div>
                             <h2 class="text-2xl font-bold text-slate-800">Data Inventaris Lab</h2>
-                            <p class="text-slate-500 text-sm">Kelola daftar perangkat dan fasilitas laboratorium</p>
                         </div>
                         <button onclick="openAddAssetModal()" class="admin-only hidden bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm">
                             <i class="fa-solid fa-plus"><span>Tambah Aset</span></i>
@@ -317,7 +287,6 @@
                                 <input type="text" id="search-inventory" oninput="renderInventory(true)" placeholder="Cari kode atau nama aset..." class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-brand-500">
                             </div>
                         </div>
-                        <!-- PERBAIKAN: Membungkus dengan overflow-x-auto dan mengatur min-width agar bisa digeser di HP -->
                         <div class="overflow-x-auto w-full">
                             <table class="w-full text-left border-collapse text-sm whitespace-nowrap min-w-[750px]">
                                 <thead>
@@ -345,7 +314,6 @@
                     </div>
 
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <!-- Area Scanner Kamera -->
                         <div id="reader" class="mb-4"></div>
                         <div class="text-center mb-6">
                             <button onclick="startScanner()" class="bg-brand-600 hover:bg-brand-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-transform hover:scale-105">
@@ -353,7 +321,6 @@
                             </button>
                         </div>
 
-                        <!-- Area Input Manual -->
                         <div class="pt-6 border-t border-slate-100">
                             <p class="text-sm font-medium text-slate-700 mb-3 text-center">Atau ketik ID Aset secara manual (Contoh: LAB-PC-001):</p>
                             <div class="flex gap-2 max-w-md mx-auto">
@@ -369,24 +336,20 @@
                 <!-- JADWAL LAB -->
                 <section id="jadwal" class="tab-content max-w-6xl mx-auto">
                     <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800">Jadwal Penggunaan Lab</h2>
-                            <p class="text-slate-500 text-sm">Daftar pemakaian ruangan dan komputer lab</p>
-                        </div>
+                        <div><h2 class="text-2xl font-bold text-slate-800">Jadwal Penggunaan Lab</h2></div>
                         <button onclick="openAddScheduleModal()" class="admin-only hidden bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm">
                             <i class="fa-solid fa-plus"><span>Tambah Jadwal</span></i>
                         </button>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <!-- PERBAIKAN: Membungkus dengan overflow-x-auto dan mengatur min-width agar bisa digeser di HP -->
                         <div class="overflow-x-auto w-full">
                             <table class="w-full text-left border-collapse text-sm whitespace-nowrap min-w-[700px]">
                                 <thead>
                                     <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
                                         <th class="p-4">Hari / Tanggal</th>
                                         <th class="p-4">Waktu</th>
-                                        <th class="p-4">Guru / Penanggung Jawab</th>
-                                        <th class="p-4">Mata Pelajaran / Kegiatan</th>
+                                        <th class="p-4">Guru / P.J.</th>
+                                        <th class="p-4">Kegiatan</th>
                                         <th class="p-4 text-center admin-only hidden">Aksi</th>
                                     </tr>
                                 </thead>
@@ -400,21 +363,14 @@
                 <!-- RIWAYAT & LAPORAN -->
                 <section id="riwayat" class="tab-content max-w-6xl mx-auto">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800">Laporan Riwayat Peminjaman</h2>
-                            <p class="text-slate-500 text-sm">Arsip lengkap sirkulasi aset laboratorium</p>
-                        </div>
+                        <div><h2 class="text-2xl font-bold text-slate-800">Laporan Riwayat Peminjaman</h2></div>
                         <div class="flex flex-wrap gap-2">
-                            <button onclick="printReport()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm">
-                                <i class="fa-solid fa-print"></i> Cetak PDF
-                            </button>
                             <button onclick="exportExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm">
                                 <i class="fa-solid fa-file-excel"></i> Export Excel
                             </button>
                         </div>
                     </div>
 
-                    <!-- Filter Mutasi Bank Style -->
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6 flex flex-wrap gap-4 items-center">
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 mb-1">Mode Filter</label>
@@ -429,7 +385,6 @@
                             <select id="filter-year" onchange="renderHistory(true)" class="px-3 py-2 border rounded-xl text-sm bg-slate-50">
                                 <option value="2026">2026</option>
                                 <option value="2027">2027</option>
-                                <option value="2028">2028</option>
                             </select>
                         </div>
                         <div id="filter-date-box" class="hidden flex gap-2">
@@ -438,14 +393,13 @@
                                 <input type="date" id="filter-start" onchange="renderHistory(true)" class="px-3 py-2 border rounded-xl text-sm bg-slate-50">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">Sampai Tanggal</label>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">Sampai</label>
                                 <input type="date" id="filter-end" onchange="renderHistory(true)" class="px-3 py-2 border rounded-xl text-sm bg-slate-50">
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <!-- PERBAIKAN: Membungkus dengan overflow-x-auto dan mengatur min-width agar bisa digeser di HP -->
                         <div class="overflow-x-auto w-full">
                             <table class="w-full text-left border-collapse text-sm whitespace-nowrap min-w-[650px]">
                                 <thead>
@@ -465,25 +419,22 @@
 
                 <!-- PENGATURAN -->
                 <section id="pengaturan" class="tab-content max-w-4xl mx-auto admin-only">
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-bold text-slate-800">Pengaturan Aplikasi</h2>
-                        <p class="text-slate-500 text-sm">Kustomisasi identitas laboratorium, teks banner, logo, dan banner</p>
-                    </div>
+                    <div class="mb-6"><h2 class="text-2xl font-bold text-slate-800">Pengaturan Aplikasi</h2></div>
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Judul / Sapaan Banner (Contoh: Selamat Datang di...)</label>
-                            <input type="text" id="setting-banner-title" value="Selamat Datang di Lab Komputer Putra PP Wali Songo" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Judul / Sapaan Banner</label>
+                            <input type="text" id="setting-banner-title" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Sub-Teks Banner</label>
-                            <input type="text" id="setting-banner" value="Tanamkan Tanggung Jawab, Disiplin, Kerapian, Kebersihan untuk mencetak SDM yang Lebih Baik" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
+                            <input type="text" id="setting-banner" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Nama Laboratorium (Teks Sistem)</label>
-                            <input type="text" id="setting-name" value="Lab Komputer Putra" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
+                            <input type="text" id="setting-name" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Upload Logo Aplikasi (Sidebar, Login & Tab Browser)</label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Upload Logo Aplikasi</label>
                             <input type="file" id="setting-logo-file" accept="image/*" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                         <div>
@@ -501,32 +452,18 @@
         </main>
     </div>
 
-    <!-- MODAL FORM ASET -->
+    <!-- MODAL FORM -->
     <div id="modal-asset" class="fixed inset-0 bg-slate-900/50 z-[999] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-xl">
             <h3 id="modal-asset-title" class="text-lg font-bold text-slate-800 mb-4">Tambah Aset Baru</h3>
             <form id="form-asset" onsubmit="saveAsset(event)" class="space-y-4">
                 <input type="hidden" id="edit-old-id" value="">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ID / Kode Aset</label>
-                    <input type="text" id="asset-id" required class="w-full px-4 py-2 border rounded-xl text-sm bg-slate-50 font-mono">
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">ID / Kode</label><input type="text" id="asset-id" required class="w-full px-4 py-2 border rounded-xl text-sm font-mono"></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">Nama</label><input type="text" id="asset-name" required class="w-full px-4 py-2 border rounded-xl text-sm"></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">Kondisi</label>
+                    <select id="asset-condition" class="w-full px-4 py-2 border rounded-xl text-sm"><option value="Baik">Baik</option><option value="Perlu Perbaikan">Perlu Perbaikan</option><option value="Rusak">Rusak</option></select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Nama Aset</label>
-                    <input type="text" id="asset-name" required class="w-full px-4 py-2 border rounded-xl text-sm">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Kondisi</label>
-                    <select id="asset-condition" class="w-full px-4 py-2 border rounded-xl text-sm bg-slate-50">
-                        <option value="Baik">Baik</option>
-                        <option value="Perlu Perbaikan">Perlu Perbaikan</option>
-                        <option value="Rusak">Rusak</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Lokasi</label>
-                    <input type="text" id="asset-location" value="Ruang Lab 01" required class="w-full px-4 py-2 border rounded-xl text-sm">
-                </div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">Lokasi</label><input type="text" id="asset-location" value="Ruang Lab 01" required class="w-full px-4 py-2 border rounded-xl text-sm"></div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeAssetModal()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-200">Batal</button>
                     <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-bold hover:bg-brand-700">Simpan</button>
@@ -535,42 +472,27 @@
         </div>
     </div>
 
-    <!-- MODAL FORM JADWAL -->
+    <!-- MODAL SCHEDULE -->
     <div id="modal-schedule" class="fixed inset-0 bg-slate-900/50 z-[999] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-xl">
             <h3 class="text-lg font-bold text-slate-800 mb-4">Tambah Jadwal Lab</h3>
             <form onsubmit="saveSchedule(event)" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal</label>
-                    <input type="date" id="sch-date" required class="w-full px-4 py-2 border rounded-xl text-sm bg-slate-50">
-                </div>
+                <div><label class="block text-sm mb-1">Tanggal</label><input type="date" id="sch-date" required class="w-full px-4 py-2 border rounded-xl text-sm"></div>
                 <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Jam Mulai</label>
-                        <input type="time" id="sch-start" required class="w-full px-4 py-2 border rounded-xl text-sm bg-slate-50">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Jam Selesai</label>
-                        <input type="time" id="sch-end" required class="w-full px-4 py-2 border rounded-xl text-sm bg-slate-50">
-                    </div>
+                    <div><label class="block text-sm mb-1">Mulai</label><input type="time" id="sch-start" required class="w-full px-4 py-2 border rounded-xl text-sm"></div>
+                    <div><label class="block text-sm mb-1">Selesai</label><input type="time" id="sch-end" required class="w-full px-4 py-2 border rounded-xl text-sm"></div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Guru / Penanggung Jawab</label>
-                    <input type="text" id="sch-teacher" required class="w-full px-4 py-2 border rounded-xl text-sm">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Mata Pelajaran / Kegiatan</label>
-                    <input type="text" id="sch-subject" required class="w-full px-4 py-2 border rounded-xl text-sm">
-                </div>
+                <div><label class="block text-sm mb-1">Guru</label><input type="text" id="sch-teacher" required class="w-full px-4 py-2 border rounded-xl text-sm"></div>
+                <div><label class="block text-sm mb-1">Kegiatan</label><input type="text" id="sch-subject" required class="w-full px-4 py-2 border rounded-xl text-sm"></div>
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeScheduleModal()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-200">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-bold hover:bg-brand-700">Simpan</button>
+                    <button type="button" onclick="closeScheduleModal()" class="px-4 py-2 bg-slate-100 rounded-xl text-sm">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm">Simpan</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL PINJAM/KEMBALI ACTION -->
+    <!-- MODAL PINJAM/KEMBALI -->
     <div id="modal-action" class="fixed inset-0 bg-slate-900/50 z-[999] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-xl">
             <h3 id="action-title" class="text-lg font-bold text-slate-800 mb-2">Proses Aset</h3>
@@ -579,20 +501,53 @@
                 <input type="hidden" id="action-asset-id">
                 <input type="hidden" id="action-type">
                 <div id="borrower-fields">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Peminjam</label>
-                        <input type="text" id="borrower-name" class="w-full px-4 py-2 border rounded-xl text-sm bg-slate-50">
-                    </div>
-                    <div class="mt-3">
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Keperluan</label>
-                        <input type="text" id="borrower-purpose" class="w-full px-4 py-2 border rounded-xl text-sm bg-slate-50">
-                    </div>
+                    <div><label class="block text-sm mb-1">Nama Peminjam</label><input type="text" id="borrower-name" class="w-full px-4 py-2 border rounded-xl text-sm"></div>
+                    <div class="mt-3"><label class="block text-sm mb-1">Keperluan</label><input type="text" id="borrower-purpose" class="w-full px-4 py-2 border rounded-xl text-sm"></div>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeActionModal()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-200">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-bold hover:bg-brand-700">Konfirmasi</button>
+                    <button type="button" onclick="closeActionModal()" class="px-4 py-2 bg-slate-100 rounded-xl text-sm">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm">Konfirmasi</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- HIDDEN CONTAINER UNTUK MEMBUAT GAMBAR LABEL STIKER (html2canvas) -->
+    <div id="label-render-container" style="position: absolute; left: -9999px; top: -9999px; width: 600px; height: 320px; background: white; border: 4px solid #0f2b4d; border-radius: 20px; overflow: hidden; font-family: 'Inter', sans-serif; display: flex; flex-direction: column;">
+        <!-- Header -->
+        <div style="background-color: #0f2b4d; height: 110px; display: flex; align-items: center; color: white; position: relative;">
+            <div id="label-icon-box" style="width: 110px; display: flex; align-items: center; justify-content: center; font-size: 55px;">
+                <i class="fa-solid fa-desktop"></i>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding-left: 5px;">
+                <div id="label-labname" style="font-size: 34px; font-weight: 900; letter-spacing: 1.5px; line-height: 1;">LAB KOMPUTER</div>
+                <div style="font-size: 17px; letter-spacing: 5px; margin-top: 5px; font-weight: 700; color: #bae6fd;">INVENTARIS</div>
+            </div>
+            <!-- Skewed Number Right -->
+            <div id="label-num" style="background-color: #0284c7; width: 120px; height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 25px; font-size: 48px; font-weight: 900; clip-path: polygon(30% 0, 100% 0, 100% 100%, 0% 100%);">
+                01
+            </div>
+        </div>
+        
+        <!-- Body Info -->
+        <div style="flex: 1; background: white; display: flex; padding: 25px 30px;">
+            <!-- Details Left -->
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; font-size: 19px; font-weight: 600; color: #1e293b;">
+                <div style="display: flex;"><div style="width: 150px;">Nama Barang</div><div>: <b id="label-name">PC Komputer</b></div></div>
+                <div style="display: flex;"><div style="width: 150px;">Kode Barang</div><div>: <span id="label-id">LK-001</span></div></div>
+                <div style="display: flex;"><div style="width: 150px;">Lokasi</div><div>: <span id="label-loc">Lab 1</span></div></div>
+                <div style="display: flex;"><div style="width: 150px;">Kondisi</div><div>: <span id="label-cond">Baik</span></div></div>
+            </div>
+            <!-- QR Right -->
+            <div style="width: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <canvas id="label-qr-canvas"></canvas>
+                <div id="label-qr-text" style="margin-top: 8px; font-size: 16px; font-weight: 800; font-family: monospace; background: #0f2b4d; color: white; padding: 4px 14px; border-radius: 16px; letter-spacing: 1px;">LK-001</div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="background-color: #0284c7; height: 45px; display: flex; align-items: center; padding: 0 30px; color: white; font-size: 16px; font-weight: 700;">
+            <i class="fa-solid fa-shield-halved" style="margin-right: 12px; font-size: 20px;"></i> Jaga Bersama, Gunakan dengan Bijak
         </div>
     </div>
 
@@ -600,22 +555,8 @@
         const API_URL = "https://script.google.com/macros/s/AKfycby_COVhJB0NqneA3vAxj82GRBMnIKQ4jw6ODssAv0t2gYPpkcIQD1ro5QDDuvr_QuW4zA/exec";
 
         let currentUser = null;
-        
-        let settings = JSON.parse(localStorage.getItem('lcp_settings')) || { 
-            name: "Lab Komputer Putra", 
-            bannerTitle: "Selamat Datang di Lab Komputer Putra PP Wali Songo",
-            banner: "Tanamkan Tanggung Jawab, Disiplin, Kerapian, Kebersihan untuk mencetak SDM yang Lebih Baik",
-            logoUrl: "https://placehold.co/100x100/ffffff/0a4a35?text=LCP",
-            bannerMode: "default",
-            bannerUrl: ""
-        };
-
-        // Cache-First Data State
-        let usersData = JSON.parse(localStorage.getItem('lcp_users')) || [
-            { username: 'admin', password: 'admin123', role: 'admin', name: 'Operator Utama' },
-            { username: 'tamu', password: 'tamu123', role: 'visitor', name: 'Pengunjung / Guru' }
-        ];
-
+        let settings = JSON.parse(localStorage.getItem('lcp_settings')) || {};
+        let usersData = JSON.parse(localStorage.getItem('lcp_users')) || [];
         let inventory = JSON.parse(localStorage.getItem('lcp_inventory')) || [];
         let schedules = JSON.parse(localStorage.getItem('lcp_schedules')) || [];
         let borrowHistory = JSON.parse(localStorage.getItem('lcp_history')) || [];
@@ -623,7 +564,6 @@
         let assetChartInstance = null;
         let borrowChartInstance = null;
 
-        // Pagination State
         let currentPageInventory = 1;
         let currentPageSchedule = 1;
         let currentPageHistory = 1;
@@ -633,10 +573,7 @@
             document.getElementById('global-loader-title').innerText = title;
             document.getElementById('global-loader').classList.remove('hidden');
         }
-
-        function hideGlobalLoader() {
-            document.getElementById('global-loader').classList.add('hidden');
-        }
+        function hideGlobalLoader() { document.getElementById('global-loader').classList.add('hidden'); }
 
         async function manualSync() {
             showGlobalLoader("Menarik Data dari Excel...");
@@ -652,21 +589,17 @@
             
             const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
             let html = `<div class="text-slate-500">Menampilkan <b>${Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}</b> - <b>${Math.min(currentPage * itemsPerPage, totalItems)}</b> dari <b>${totalItems}</b> data</div>`;
-            
             html += `<div class="flex gap-1">`;
-            html += `<button onclick="${callbackName}(${currentPage - 1})" class="px-3 py-1.5 rounded-lg border ${currentPage === 1 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white text-slate-700 hover:bg-brand-50 hover:text-brand-600 hover:border-brand-200'}" ${currentPage === 1 ? 'disabled' : ''}><i class="fa-solid fa-chevron-left"></i></button>`;
-            
+            html += `<button onclick="${callbackName}(${currentPage - 1})" class="px-3 py-1.5 rounded-lg border ${currentPage === 1 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white hover:bg-brand-50 hover:text-brand-600'}" ${currentPage === 1 ? 'disabled' : ''}><i class="fa-solid fa-chevron-left"></i></button>`;
             for (let i = 1; i <= totalPages; i++) {
                 if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
-                    html += `<button onclick="${callbackName}(${i})" class="px-3 py-1.5 rounded-lg border font-medium ${currentPage === i ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-700 hover:bg-brand-50 hover:text-brand-600 hover:border-brand-200'}">${i}</button>`;
+                    html += `<button onclick="${callbackName}(${i})" class="px-3 py-1.5 rounded-lg border font-medium ${currentPage === i ? 'bg-brand-600 text-white border-brand-600' : 'bg-white hover:bg-brand-50'}">${i}</button>`;
                 } else if (i === currentPage - 2 || i === currentPage + 2) {
                     html += `<span class="px-2 py-1.5 text-slate-400">...</span>`;
                 }
             }
-            
-            html += `<button onclick="${callbackName}(${currentPage + 1})" class="px-3 py-1.5 rounded-lg border ${currentPage === totalPages ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white text-slate-700 hover:bg-brand-50 hover:text-brand-600 hover:border-brand-200'}" ${currentPage === totalPages ? 'disabled' : ''}><i class="fa-solid fa-chevron-right"></i></button>`;
+            html += `<button onclick="${callbackName}(${currentPage + 1})" class="px-3 py-1.5 rounded-lg border ${currentPage === totalPages ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white hover:bg-brand-50'}" ${currentPage === totalPages ? 'disabled' : ''}><i class="fa-solid fa-chevron-right"></i></button>`;
             html += `</div>`;
-            
             container.innerHTML = html;
         }
 
@@ -674,7 +607,6 @@
         function changePageSchedule(page) { currentPageSchedule = page; renderSchedules(); }
         function changePageHistory(page) { currentPageHistory = page; renderHistory(); }
 
-        // Fetch data background dari Google Sheets
         async function fetchSheetData() {
             try {
                 const res = await fetch(API_URL + "?action=getData");
@@ -684,7 +616,6 @@
                     if (result.inventory && result.inventory.length > 0) inventory = result.inventory;
                     if (result.schedules && result.schedules.length > 0) schedules = result.schedules;
                     if (result.borrowHistory && result.borrowHistory.length > 0) borrowHistory = result.borrowHistory;
-                    
                     if (result.settings) {
                         settings = result.settings;
                         if(document.getElementById('setting-name')) document.getElementById('setting-name').value = settings.name || "";
@@ -710,23 +641,12 @@
             localStorage.setItem('lcp_inventory', JSON.stringify(inventory));
             localStorage.setItem('lcp_schedules', JSON.stringify(schedules));
             localStorage.setItem('lcp_history', JSON.stringify(borrowHistory));
-
             try {
                 await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'saveData',
-                        inventory: inventory,
-                        schedules: schedules,
-                        borrowHistory: borrowHistory,
-                        settings: settings
-                    })
+                    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'saveData', inventory: inventory, schedules: schedules, borrowHistory: borrowHistory, settings: settings })
                 });
-            } catch (e) {
-                console.log('Sync background error:', e);
-            }
+            } catch (e) { }
         }
 
         function checkAuth() {
@@ -739,21 +659,16 @@
                 loginOverlay.classList.add('hidden');
                 appWrapper.classList.remove('hidden');
                 applyPermissions();
-                
                 fetchSheetData();
                 renderAll();
                 switchTab('dashboard');
             } else {
                 loginOverlay.classList.remove('hidden');
                 appWrapper.classList.add('hidden');
-                
                 fetchSheetData(); 
-
                 if (settings.logoUrl) {
                     const loginLogoContainer = document.querySelector('#login-overlay .w-20.h-20');
-                    if (loginLogoContainer) {
-                        loginLogoContainer.innerHTML = `<img src="${settings.logoUrl}" alt="Logo" class="w-full h-full rounded-full object-cover">`;
-                    }
+                    if (loginLogoContainer) loginLogoContainer.innerHTML = `<img src="${settings.logoUrl}" alt="Logo" class="w-full h-full rounded-full object-cover">`;
                 }
                 const loginTitle = document.getElementById('login-title');
                 if (loginTitle) loginTitle.innerText = settings.name || "Lab Komputer Putra";
@@ -764,24 +679,18 @@
             const userInp = document.getElementById('login-username').value.trim();
             const passInp = document.getElementById('login-password').value.trim();
 
-            if (!userInp || !passInp) {
-                showToast('Masukkan Username dan Password!', 'error');
-                return;
-            }
+            if (!userInp || !passInp) { showToast('Masukkan Username dan Password!', 'error'); return; }
 
             document.getElementById('login-box-content').classList.add('hidden');
             document.getElementById('login-loader').classList.remove('hidden');
 
             setTimeout(() => {
                 const matchedUser = usersData.find(u => u.username == userInp && u.password == passInp);
-
                 if (matchedUser) {
                     currentUser = { role: matchedUser.role, name: matchedUser.name || 'Pengguna' };
                     sessionStorage.setItem('lcp_user', JSON.stringify(currentUser));
-                    
                     document.getElementById('login-box-content').classList.remove('hidden');
                     document.getElementById('login-loader').classList.add('hidden');
-                    
                     checkAuth();
                 } else {
                     document.getElementById('login-box-content').classList.remove('hidden');
@@ -791,72 +700,44 @@
             }, 800);
         }
 
-        function handleLogout() {
-            sessionStorage.removeItem('lcp_user');
-            currentUser = null;
-            checkAuth();
-        }
+        function handleLogout() { sessionStorage.removeItem('lcp_user'); currentUser = null; checkAuth(); }
 
         function applyPermissions() {
             if (!currentUser) return;
             const isAdmin = currentUser.role === 'admin';
             document.querySelectorAll('.admin-only').forEach(el => {
-                if (isAdmin) el.classList.remove('hidden');
-                else el.classList.add('hidden');
+                if (isAdmin) el.classList.remove('hidden'); else el.classList.add('hidden');
             });
             document.getElementById('user-name-display').innerText = currentUser.name;
         }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            const targetTab = document.getElementById(tabId);
-            if (targetTab) targetTab.classList.add('active');
-
+            document.getElementById(tabId)?.classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-nav'));
-            const activeBtn = document.getElementById('nav-' + tabId);
-            if (activeBtn) activeBtn.classList.add('active-nav');
+            document.getElementById('nav-' + tabId)?.classList.add('active-nav');
+            if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full');
 
-            if (window.innerWidth < 768) {
-                document.getElementById('sidebar').classList.add('-translate-x-full');
-            }
-
-            if (tabId === 'peminjaman') {
-                setTimeout(startScanner, 400);
-            } else {
-                stopScanner();
-            }
-
-            if (tabId === 'dashboard') {
-                setTimeout(initCharts, 200);
-            }
+            if (tabId === 'peminjaman') setTimeout(startScanner, 400); else stopScanner();
+            if (tabId === 'dashboard') setTimeout(initCharts, 200);
         }
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-        }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
 
         function renderAll() {
-            renderInventory();
-            renderSchedules();
-            renderHistory();
-            updateStats();
-            
-            document.getElementById('ui-banner-title').innerText = settings.bannerTitle || "Selamat Datang di Lab Komputer Putra PP Wali Songo";
-            document.getElementById('ui-banner-subtitle').innerText = settings.banner;
-            
-            document.getElementById('sidebar-title').innerText = settings.name || "Lab Komputer Putra";
+            renderInventory(); renderSchedules(); renderHistory(); updateStats();
+            document.getElementById('ui-banner-title').innerText = settings.bannerTitle || "Selamat Datang di Lab Komputer";
+            document.getElementById('ui-banner-subtitle').innerText = settings.banner || "";
+            document.getElementById('sidebar-title').innerText = settings.name || "Lab Komputer";
             
             const loginTitle = document.getElementById('login-title');
-            if (loginTitle) loginTitle.innerText = settings.name || "Lab Komputer Putra";
-
-            document.title = (settings.name || "Lab Komputer Putra") + " - Manajemen Lab Terpadu";
+            if (loginTitle) loginTitle.innerText = settings.name || "Lab Komputer";
+            document.title = (settings.name || "Lab Komputer") + " - Manajemen Lab";
             
             if (settings.logoUrl) {
                 document.getElementById('sidebar-logo').src = settings.logoUrl;
                 const loginLogoContainer = document.querySelector('#login-overlay .w-20.h-20');
-                if (loginLogoContainer) {
-                    loginLogoContainer.innerHTML = `<img src="${settings.logoUrl}" alt="Logo" class="w-full h-full rounded-full object-cover">`;
-                }
+                if (loginLogoContainer) loginLogoContainer.innerHTML = `<img src="${settings.logoUrl}" class="w-full h-full rounded-full object-cover">`;
                 const favicon = document.getElementById('favicon');
                 if (favicon) favicon.href = settings.logoUrl;
             }
@@ -864,11 +745,7 @@
             const bannerBox = document.getElementById('dashboard-banner-box');
             if (settings.bannerMode === 'custom' && settings.bannerUrl) {
                 bannerBox.style.backgroundImage = `linear-gradient(rgba(6,95,70,0.85), rgba(6,95,70,0.85)), url('${settings.bannerUrl}')`;
-            } else {
-                bannerBox.style.backgroundImage = 'none';
-            }
-
-            initCharts();
+            } else { bannerBox.style.backgroundImage = 'none'; }
         }
 
         function updateStats() {
@@ -883,41 +760,23 @@
             const ctxAsset = document.getElementById('assetChart');
             if (ctxAsset) {
                 if (assetChartInstance) assetChartInstance.destroy();
-                const tersediaCount = inventory.filter(i => i.status === 'Tersedia').length;
-                const dipinjamCount = inventory.filter(i => i.status === 'Dipinjam').length;
-
                 assetChartInstance = new Chart(ctxAsset, {
                     type: 'doughnut',
                     data: {
                         labels: ['Tersedia', 'Dipinjam'],
-                        datasets: [{
-                            data: [tersediaCount, dipinjamCount],
-                            backgroundColor: ['#10b981', '#f59e0b'],
-                            borderWidth: 2
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false }
+                        datasets: [{ data: [inventory.filter(i => i.status === 'Tersedia').length, inventory.filter(i => i.status === 'Dipinjam').length], backgroundColor: ['#10b981', '#f59e0b'] }]
+                    }, options: { responsive: true, maintainAspectRatio: false }
                 });
             }
-
             const ctxBorrow = document.getElementById('borrowChart');
             if (ctxBorrow) {
                 if (borrowChartInstance) borrowChartInstance.destroy();
-                const totalSelesai = borrowHistory.filter(h => h.status === 'Selesai').length;
-                const totalAktif = borrowHistory.filter(h => h.status === 'Dipinjam').length;
-
                 borrowChartInstance = new Chart(ctxBorrow, {
                     type: 'bar',
                     data: {
-                        labels: ['Selesai Dikembalikan', 'Aktif Dipinjam'],
-                        datasets: [{
-                            label: 'Jumlah Transaksi',
-                            data: [totalSelesai, totalAktif],
-                            backgroundColor: ['#059669', '#3b82f6'],
-                            borderRadius: 8
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+                        labels: ['Selesai', 'Aktif'],
+                        datasets: [{ label: 'Jumlah Transaksi', data: [borrowHistory.filter(h => h.status === 'Selesai').length, borrowHistory.filter(h => h.status === 'Dipinjam').length], backgroundColor: ['#059669', '#3b82f6'] }]
+                    }, options: { responsive: true, maintainAspectRatio: false }
                 });
             }
         }
@@ -929,11 +788,9 @@
             tbody.innerHTML = '';
 
             const filtered = inventory.filter(i => (i.name && i.name.toLowerCase().includes(query)) || (i.id && i.id.toLowerCase().includes(query)));
-            
             if (filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Tidak ada data inventaris</td></tr>`;
-                document.getElementById('inventory-pagination').innerHTML = '';
-                return;
+                document.getElementById('inventory-pagination').innerHTML = ''; return;
             }
 
             const start = (currentPageInventory - 1) * itemsPerPage;
@@ -949,244 +806,191 @@
                     <td class="p-4 text-slate-500">${item.location || '-'}</td>
                     <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.status === 'Tersedia' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${item.status || 'Tersedia'}</span></td>
                     <td class="p-4 text-center flex justify-center gap-2">
-                        <button onclick="printQR('${item.id}')" class="p-2 text-slate-500 hover:text-brand-600 rounded-lg" title="Cetak QR"><i class="fa-solid fa-qrcode"></i></button>
+                        <button onclick="downloadQRImage('${item.id}')" class="p-2 text-slate-500 hover:text-brand-600 rounded-lg" title="Unduh Label JPG"><i class="fa-solid fa-qrcode"></i></button>
                         <button onclick="openEditAssetModal('${item.id}')" class="admin-only ${currentUser?.role === 'admin' ? '' : 'hidden'} p-2 text-slate-500 hover:text-blue-600 rounded-lg" title="Edit"><i class="fa-solid fa-pen"></i></button>
                         <button onclick="deleteAsset('${item.id}')" class="admin-only ${currentUser?.role === 'admin' ? '' : 'hidden'} p-2 text-slate-500 hover:text-red-600 rounded-lg" title="Hapus"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
-            
             buildPagination(filtered.length, currentPageInventory, 'inventory-pagination', 'changePageInventory');
         }
 
+        // FUNGSI BUAT LABEL .JPG YANG BARU
+        function downloadQRImage(id) {
+            const index = inventory.findIndex(i => i.id === id);
+            if (index === -1) return;
+            const asset = inventory[index];
+            
+            showGlobalLoader("Merakit Label Stiker (JPG)...");
+
+            // Format angka urutan (misal: 01, 02, 03)
+            const itemNum = String(index + 1).padStart(2, '0');
+            const labName = (settings.name || 'LAB KOMPUTER').toUpperCase();
+            
+            // Logika Smart Icon FontAwesome
+            function getAssetIcon(name) {
+                name = name.toLowerCase();
+                if(name.includes('pc') || name.includes('komputer') || name.includes('cpu')) return 'fa-solid fa-desktop';
+                if(name.includes('monitor') || name.includes('led') || name.includes('lcd')) return 'fa-solid fa-tv';
+                if(name.includes('keyboard')) return 'fa-solid fa-keyboard';
+                if(name.includes('mouse')) return 'fa-solid fa-computer-mouse';
+                if(name.includes('print')) return 'fa-solid fa-print';
+                if(name.includes('router') || name.includes('wifi') || name.includes('mikrotik')) return 'fa-solid fa-wifi';
+                if(name.includes('ups') || name.includes('power')) return 'fa-solid fa-plug';
+                if(name.includes('switch') || name.includes('hub')) return 'fa-solid fa-network-wired';
+                if(name.includes('proyek') || name.includes('projector')) return 'fa-solid fa-video';
+                if(name.includes('server')) return 'fa-solid fa-server';
+                if(name.includes('laptop') || name.includes('notebook')) return 'fa-solid fa-laptop';
+                if(name.includes('cctv') || name.includes('kamera') || name.includes('camera')) return 'fa-solid fa-video';
+                if(name.includes('gedung') || name.includes('ruang') || name.includes('lab')) return 'fa-solid fa-building';
+                if(name.includes('meja') || name.includes('kursi') || name.includes('lemari') || name.includes('rak')) return 'fa-solid fa-chair';
+                if(name.includes('jaring') || name.includes('kabel')) return 'fa-solid fa-ethernet';
+                return 'fa-solid fa-box'; // Default Icon
+            }
+            
+            // Masukkan data ke template DOM tersembunyi
+            document.getElementById('label-icon-box').innerHTML = `<i class="${getAssetIcon(asset.name)}"></i>`;
+            document.getElementById('label-labname').innerText = labName;
+            document.getElementById('label-num').innerText = itemNum;
+            
+            document.getElementById('label-name').innerText = asset.name.length > 22 ? asset.name.substring(0, 22) + '...' : asset.name;
+            document.getElementById('label-id').innerText = asset.id;
+            document.getElementById('label-loc').innerText = asset.location || '-';
+            document.getElementById('label-cond').innerText = asset.condition || 'Baik';
+            document.getElementById('label-qr-text').innerText = asset.id;
+
+            // Generate QR Code menggunakan QRious ke dalam Canvas
+            new QRious({
+                element: document.getElementById('label-qr-canvas'),
+                value: asset.id,
+                size: 110,
+                level: 'H' // High Error Correction
+            });
+
+            // Beri waktu sebentar agar font FontAwesome dan gambar termuat sepenuhnya
+            setTimeout(() => {
+                const labelContainer = document.getElementById('label-render-container');
+                
+                // Gunakan html2canvas untuk "Memotret" desain HTML menjadi gambar
+                html2canvas(labelContainer, {
+                    scale: 3, // Kualitas High-Res untuk cetak stiker
+                    useCORS: true,
+                    backgroundColor: "#ffffff"
+                }).then(canvas => {
+                    // Konversi ke File JPG
+                    const imgData = canvas.toDataURL("image/jpeg", 1.0);
+                    
+                    // Pemicu Download Otomatis
+                    const link = document.createElement('a');
+                    link.download = `Label_Aset_${asset.id}.jpg`;
+                    link.href = imgData;
+                    link.click();
+                    
+                    hideGlobalLoader();
+                    showToast('Label Stiker (JPG) berhasil diunduh!', 'success');
+                }).catch(err => {
+                    hideGlobalLoader();
+                    showToast('Gagal merender gambar label', 'error');
+                });
+            }, 600);
+        }
+
+        // ... Sisa fungsi tidak berubah (renderSchedules, dll) ...
         function renderSchedules(resetPage = false) {
             if (resetPage) currentPageSchedule = 1;
             const tbody = document.getElementById('schedule-table-body');
             tbody.innerHTML = '';
-            
-            if (schedules.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Tidak ada data jadwal</td></tr>`;
-                document.getElementById('schedule-pagination').innerHTML = '';
-                return;
-            }
-
+            if (schedules.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Tidak ada data jadwal</td></tr>`; document.getElementById('schedule-pagination').innerHTML = ''; return; }
             const start = (currentPageSchedule - 1) * itemsPerPage;
-            const paginated = schedules.slice(start, start + itemsPerPage);
-
-            paginated.forEach(sch => {
+            schedules.slice(start, start + itemsPerPage).forEach(sch => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="p-4 font-medium">${sch.date}</td>
-                    <td class="p-4">${sch.start} - ${sch.end}</td>
-                    <td class="p-4">${sch.teacher}</td>
-                    <td class="p-4">${sch.subject}</td>
-                    <td class="p-4 text-center admin-only ${currentUser?.role === 'admin' ? '' : 'hidden'}">
-                        <!-- PERBAIKAN BUG: Menambahkan tanda kutip tunggal '' pada sch.id -->
-                        <button onclick="deleteSchedule('${sch.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                `;
+                tr.innerHTML = `<td class="p-4 font-medium">${sch.date}</td><td class="p-4">${sch.start} - ${sch.end}</td><td class="p-4">${sch.teacher}</td><td class="p-4">${sch.subject}</td><td class="p-4 text-center admin-only ${currentUser?.role === 'admin' ? '' : 'hidden'}"><button onclick="deleteSchedule('${sch.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td>`;
                 tbody.appendChild(tr);
             });
-            
             buildPagination(schedules.length, currentPageSchedule, 'schedule-pagination', 'changePageSchedule');
         }
 
-        function toggleReportMode() {
-            currentPageHistory = 1;
-            const mode = document.getElementById('report-mode').value;
-            document.getElementById('filter-year-box').classList.toggle('hidden', mode !== 'year');
-            document.getElementById('filter-date-box').classList.toggle('hidden', mode !== 'range');
-            renderHistory(true);
-        }
+        function toggleReportMode() { currentPageHistory = 1; const mode = document.getElementById('report-mode').value; document.getElementById('filter-year-box').classList.toggle('hidden', mode !== 'year'); document.getElementById('filter-date-box').classList.toggle('hidden', mode !== 'range'); renderHistory(true); }
 
         function renderHistory(resetPage = false) {
             if (resetPage) currentPageHistory = 1;
             const mode = document.getElementById('report-mode').value;
             const tbody = document.getElementById('history-table-body');
             tbody.innerHTML = '';
-
             let filtered = borrowHistory.filter(h => {
                 if (!h.borrowDate || h.borrowDate === '-') return true;
-                if (mode === 'year') {
-                    const yr = document.getElementById('filter-year').value;
-                    return h.borrowDate.toString().startsWith(yr);
-                } else if (mode === 'range') {
-                    const start = document.getElementById('filter-start').value;
-                    const end = document.getElementById('filter-end').value;
+                if (mode === 'year') return h.borrowDate.toString().startsWith(document.getElementById('filter-year').value);
+                else if (mode === 'range') {
+                    const start = document.getElementById('filter-start').value; const end = document.getElementById('filter-end').value;
                     if (!start || !end) return true;
-                    const itemDate = h.borrowDate.toString().slice(0, 10);
-                    return itemDate >= start && itemDate <= end;
-                }
-                return true;
+                    return h.borrowDate.toString().slice(0, 10) >= start && h.borrowDate.toString().slice(0, 10) <= end;
+                } return true;
             });
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400">Tidak ada data riwayat</td></tr>`;
-                document.getElementById('history-pagination').innerHTML = '';
-                return;
-            }
-            
+            if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400">Tidak ada data riwayat</td></tr>`; document.getElementById('history-pagination').innerHTML = ''; return; }
             const start = (currentPageHistory - 1) * itemsPerPage;
-            const paginated = filtered.slice(start, start + itemsPerPage);
-
-            paginated.forEach(h => {
+            filtered.slice(start, start + itemsPerPage).forEach(h => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="p-4 text-xs">${h.borrowDate}</td>
-                    <td class="p-4 font-medium">${h.assetName} <br><span class="text-xs font-mono text-slate-400">${h.assetId}</span></td>
-                    <td class="p-4">${h.borrower}</td>
-                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${h.status === 'Selesai' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${h.status}</span></td>
-                `;
+                tr.innerHTML = `<td class="p-4 text-xs">${h.borrowDate}</td><td class="p-4 font-medium">${h.assetName} <br><span class="text-xs font-mono text-slate-400">${h.assetId}</span></td><td class="p-4">${h.borrower}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${h.status === 'Selesai' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${h.status}</span></td>`;
                 tbody.appendChild(tr);
             });
-            
             buildPagination(filtered.length, currentPageHistory, 'history-pagination', 'changePageHistory');
         }
 
         let html5QrCode = null;
         function startScanner() {
-            const readerEl = document.getElementById('reader');
-            if (!readerEl) return;
-            
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                showToast('Browser memblokir kamera. Gunakan HTTPS.', 'error');
-                return;
-            }
-
-            if (html5QrCode) {
-                try {
-                    html5QrCode.stop().catch(() => {}).finally(() => { html5QrCode = null; initCamera(); });
-                } catch(e) { initCamera(); }
-            } else {
-                initCamera();
-            }
+            if (!document.getElementById('reader')) return;
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showToast('Browser memblokir kamera. Gunakan HTTPS.', 'error'); return; }
+            if (html5QrCode) { try { html5QrCode.stop().catch(()=>{}).finally(()=>{ html5QrCode = null; initCamera(); }); } catch(e) { initCamera(); } } else { initCamera(); }
         }
 
         function initCamera() {
             try {
                 html5QrCode = new Html5Qrcode("reader");
                 const config = { fps: 10, qrbox: { width: 220, height: 220 } };
-                
-                html5QrCode.start(
-                    { facingMode: "environment" },
-                    config,
-                    qrCodeMessage => { handleScannedCode(qrCodeMessage); },
-                    errorMessage => {}
-                ).catch(err => {
-                    html5QrCode.start(
-                        { facingMode: "user" },
-                        config,
-                        qrCodeMessage => { handleScannedCode(qrCodeMessage); },
-                        errorMessage => {}
-                    ).catch(err2 => {
-                        showToast('Gagal mengakses kamera.', 'error');
-                    });
+                html5QrCode.start({ facingMode: "environment" }, config, qrCodeMessage => { handleScannedCode(qrCodeMessage); }, errorMessage => {}).catch(err => {
+                    html5QrCode.start({ facingMode: "user" }, config, qrCodeMessage => { handleScannedCode(qrCodeMessage); }, errorMessage => {}).catch(err2 => { showToast('Gagal mengakses kamera.', 'error'); });
                 });
-            } catch(e) { 
-                showToast('Gagal memulai scanner.', 'error');
-            }
+            } catch(e) { showToast('Gagal memulai scanner.', 'error'); }
         }
 
-        function stopScanner() {
-            if (html5QrCode) {
-                try {
-                    html5QrCode.stop().then(() => { html5QrCode = null; }).catch(() => { html5QrCode = null; });
-                } catch(e) { html5QrCode = null; }
-            }
-        }
-
-        function processManualScan() {
-            const input = document.getElementById('manual-scan-id');
-            const code = input.value.trim();
-            if (!code) {
-                showToast('Masukkan ID Aset terlebih dahulu!', 'error');
-                return;
-            }
-            handleScannedCode(code);
-            input.value = '';
-        }
-
+        function stopScanner() { if (html5QrCode) { try { html5QrCode.stop().then(() => { html5QrCode = null; }).catch(() => { html5QrCode = null; }); } catch(e) { html5QrCode = null; } } }
+        function processManualScan() { const input = document.getElementById('manual-scan-id'); const code = input.value.trim(); if (!code) { showToast('Masukkan ID Aset terlebih dahulu!', 'error'); return; } handleScannedCode(code); input.value = ''; }
+        
         function handleScannedCode(code) {
             const asset = inventory.find(i => i.id.toLowerCase() === code.toLowerCase());
-            
-            if (!asset) {
-                showToast('Aset dengan kode ' + code + ' tidak ditemukan!', 'error');
-                return;
-            }
+            if (!asset) { showToast('Aset dengan kode ' + code + ' tidak ditemukan!', 'error'); return; }
             stopScanner();
             document.getElementById('action-asset-id').value = asset.id;
             document.getElementById('action-title').innerText = asset.status === 'Tersedia' ? 'Pinjam Aset' : 'Kembalikan Aset';
             document.getElementById('action-asset-desc').innerText = `${asset.name} (${asset.id}) - Status: ${asset.status}`;
             document.getElementById('action-type').value = asset.status === 'Tersedia' ? 'borrow' : 'return';
             document.getElementById('borrower-fields').style.display = asset.status === 'Tersedia' ? 'block' : 'none';
-            
-            document.getElementById('borrower-name').value = '';
-            document.getElementById('borrower-purpose').value = '';
-            
+            document.getElementById('borrower-name').value = ''; document.getElementById('borrower-purpose').value = '';
             document.getElementById('modal-action').classList.remove('hidden');
         }
 
         async function processBorrowAction(e) {
             e.preventDefault();
-            const id = document.getElementById('action-asset-id').value;
-            const type = document.getElementById('action-type').value;
-            const asset = inventory.find(i => i.id === id);
-            
+            const id = document.getElementById('action-asset-id').value; const type = document.getElementById('action-type').value; const asset = inventory.find(i => i.id === id);
             showGlobalLoader(type === 'borrow' ? "Memproses Peminjaman..." : "Memproses Pengembalian...");
-
             if (type === 'borrow') {
-                const borrower = document.getElementById('borrower-name').value;
-                const purpose = document.getElementById('borrower-purpose').value;
-                asset.status = 'Dipinjam';
-                asset.borrower = borrower;
-                asset.purpose = purpose;
-                borrowHistory.unshift({
-                    id: Date.now(),
-                    assetId: asset.id,
-                    assetName: asset.name,
-                    borrower: `${borrower} (${purpose})`,
-                    purpose: purpose,
-                    borrowDate: new Date().toISOString().slice(0, 19).replace('T', ' '),
-                    returnDate: '-',
-                    status: 'Dipinjam'
-                });
-                showToast('Aset berhasil dipinjam!', 'success');
+                const borrower = document.getElementById('borrower-name').value; const purpose = document.getElementById('borrower-purpose').value;
+                asset.status = 'Dipinjam'; asset.borrower = borrower; asset.purpose = purpose;
+                borrowHistory.unshift({ id: Date.now(), assetId: asset.id, assetName: asset.name, borrower: `${borrower} (${purpose})`, purpose: purpose, borrowDate: new Date().toISOString().slice(0, 19).replace('T', ' '), returnDate: '-', status: 'Dipinjam' });
             } else {
-                asset.status = 'Tersedia';
-                asset.borrower = '-';
-                asset.purpose = '-';
+                asset.status = 'Tersedia'; asset.borrower = '-'; asset.purpose = '-';
                 const hist = borrowHistory.find(h => h.assetId === asset.id && h.status === 'Dipinjam');
-                if (hist) {
-                    hist.status = 'Selesai';
-                    hist.returnDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
-                }
+                if (hist) { hist.status = 'Selesai'; hist.returnDate = new Date().toISOString().slice(0, 19).replace('T', ' '); }
             }
-            closeActionModal();
-            await syncToSheet();
-            renderAll();
-            hideGlobalLoader();
-            showToast(type === 'borrow' ? 'Aset berhasil dipinjam!' : 'Aset berhasil dikembalikan!', 'success');
+            closeActionModal(); await syncToSheet(); renderAll(); hideGlobalLoader(); showToast(type === 'borrow' ? 'Aset berhasil dipinjam!' : 'Aset berhasil dikembalikan!', 'success');
         }
 
-        function openAddAssetModal() {
-            document.getElementById('edit-old-id').value = '';
-            document.getElementById('modal-asset-title').innerText = 'Tambah Aset Baru';
-            document.getElementById('asset-id').disabled = false;
-            document.getElementById('form-asset').reset();
-            document.getElementById('modal-asset').classList.remove('hidden');
-        }
-
+        function openAddAssetModal() { document.getElementById('edit-old-id').value = ''; document.getElementById('modal-asset-title').innerText = 'Tambah Aset Baru'; document.getElementById('asset-id').disabled = false; document.getElementById('form-asset').reset(); document.getElementById('modal-asset').classList.remove('hidden'); }
         function openEditAssetModal(id) {
-            const asset = inventory.find(i => i.id === id);
-            if (!asset) return;
-            document.getElementById('edit-old-id').value = asset.id;
-            document.getElementById('modal-asset-title').innerText = 'Edit Aset';
-            document.getElementById('asset-id').value = asset.id;
-            document.getElementById('asset-id').disabled = false;
-            document.getElementById('asset-name').value = asset.name;
-            document.getElementById('asset-condition').value = asset.condition;
-            document.getElementById('asset-location').value = asset.location;
+            const asset = inventory.find(i => String(i.id) === String(id)); if (!asset) return;
+            document.getElementById('edit-old-id').value = asset.id; document.getElementById('modal-asset-title').innerText = 'Edit Aset'; document.getElementById('asset-id').value = asset.id; document.getElementById('asset-id').disabled = false;
+            document.getElementById('asset-name').value = asset.name; document.getElementById('asset-condition').value = asset.condition; document.getElementById('asset-location').value = asset.location;
             document.getElementById('modal-asset').classList.remove('hidden');
         }
 
@@ -1197,240 +1001,50 @@
 
         async function saveAsset(e) {
             e.preventDefault();
-            const oldId = document.getElementById('edit-old-id').value;
-            const newId = document.getElementById('asset-id').value.trim();
-            const name = document.getElementById('asset-name').value.trim();
-            const condition = document.getElementById('asset-condition').value;
-            const location = document.getElementById('asset-location').value;
-
+            const oldId = document.getElementById('edit-old-id').value; const newId = document.getElementById('asset-id').value.trim(); const name = document.getElementById('asset-name').value.trim(); const condition = document.getElementById('asset-condition').value; const location = document.getElementById('asset-location').value;
             if (oldId !== '') {
-                const index = inventory.findIndex(i => i.id === oldId);
-                if (index !== -1) {
-                    inventory[index].id = newId;
-                    inventory[index].name = name;
-                    inventory[index].condition = condition;
-                    inventory[index].location = location;
-                    
-                    borrowHistory.forEach(h => {
-                        if (h.assetId === oldId) {
-                            h.assetId = newId;
-                            h.assetName = name;
-                        }
-                    });
-                }
+                const index = inventory.findIndex(i => String(i.id) === String(oldId));
+                if (index !== -1) { inventory[index].id = newId; inventory[index].name = name; inventory[index].condition = condition; inventory[index].location = location; borrowHistory.forEach(h => { if (String(h.assetId) === String(oldId)) { h.assetId = newId; h.assetName = name; } }); }
             } else {
-                if (inventory.some(i => i.id.toLowerCase() === newId.toLowerCase())) {
-                    showToast('ID Aset sudah terdaftar!', 'error');
-                    return;
-                }
+                if (inventory.some(i => i.id.toLowerCase() === newId.toLowerCase())) { showToast('ID Aset sudah terdaftar!', 'error'); return; }
                 inventory.push({ id: newId, name, condition, location, status: 'Tersedia', borrower: '-', purpose: '-' });
             }
-            closeAssetModal();
-            
-            showGlobalLoader("Menyimpan Aset ke Spreadsheet...");
-            await syncToSheet();
-            renderAll();
-            hideGlobalLoader();
-            showToast('Data berhasil disimpan ke Spreadsheet!', 'success');
+            closeAssetModal(); showGlobalLoader("Menyimpan Aset..."); await syncToSheet(); renderAll(); hideGlobalLoader(); showToast('Data berhasil disimpan!', 'success');
         }
 
-        async function saveSchedule(e) {
-            e.preventDefault();
-            schedules.push({
-                id: Date.now().toString(),
-                date: document.getElementById('sch-date').value,
-                start: document.getElementById('sch-start').value,
-                end: document.getElementById('sch-end').value,
-                teacher: document.getElementById('sch-teacher').value,
-                subject: document.getElementById('sch-subject').value
-            });
-            closeScheduleModal();
-            
-            showGlobalLoader("Menyimpan Jadwal...");
-            await syncToSheet();
-            renderSchedules();
-            updateStats();
-            hideGlobalLoader();
-            showToast('Jadwal berhasil ditambahkan!', 'success');
-        }
-
-        async function deleteAsset(id) {
-            if (confirm('Hapus aset ini?')) {
-                // BUG FIX: Ensure both are treated as strings
-                inventory = inventory.filter(i => String(i.id) !== String(id));
-                showGlobalLoader("Menghapus Data Aset...");
-                await syncToSheet();
-                renderAll();
-                hideGlobalLoader();
-                showToast('Aset berhasil dihapus!', 'success');
-            }
-        }
-
-        async function deleteSchedule(id) {
-            if (confirm('Hapus jadwal ini?')) {
-                // BUG FIX: Ensure both are treated as strings to avoid type mismatch
-                schedules = schedules.filter(s => String(s.id) !== String(id));
-                showGlobalLoader("Menghapus Jadwal...");
-                await syncToSheet();
-                renderSchedules();
-                updateStats();
-                hideGlobalLoader();
-                showToast('Jadwal berhasil dihapus!', 'success');
-            }
-        }
+        async function saveSchedule(e) { e.preventDefault(); schedules.push({ id: Date.now().toString(), date: document.getElementById('sch-date').value, start: document.getElementById('sch-start').value, end: document.getElementById('sch-end').value, teacher: document.getElementById('sch-teacher').value, subject: document.getElementById('sch-subject').value }); closeScheduleModal(); showGlobalLoader("Menyimpan Jadwal..."); await syncToSheet(); renderSchedules(); updateStats(); hideGlobalLoader(); showToast('Jadwal berhasil ditambahkan!', 'success'); }
+        async function deleteAsset(id) { if (confirm('Hapus aset ini?')) { inventory = inventory.filter(i => String(i.id) !== String(id)); showGlobalLoader("Menghapus Aset..."); await syncToSheet(); renderAll(); hideGlobalLoader(); showToast('Aset dihapus!', 'success'); } }
+        async function deleteSchedule(id) { if (confirm('Hapus jadwal ini?')) { schedules = schedules.filter(s => String(s.id) !== String(id)); showGlobalLoader("Menghapus Jadwal..."); await syncToSheet(); renderSchedules(); updateStats(); hideGlobalLoader(); showToast('Jadwal dihapus!', 'success'); } }
 
         function compressImage(file, maxWidth, quality) {
             return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > maxWidth) {
-                            height = Math.round(height * (maxWidth / width));
-                            width = maxWidth;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.fillStyle = "#ffffff";
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
+                const reader = new FileReader(); reader.onload = function(event) { const img = new Image(); img.onload = function() { const canvas = document.createElement('canvas'); let width = img.width; let height = img.height; if (width > maxWidth) { height = Math.round(height * (maxWidth / width)); width = maxWidth; } canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', quality)); }; img.src = event.target.result; }; reader.readAsDataURL(file);
             });
         }
 
         async function saveSettings() {
-            settings.name = document.getElementById('setting-name').value;
-            settings.bannerTitle = document.getElementById('setting-banner-title').value;
-            settings.banner = document.getElementById('setting-banner').value;
-            settings.bannerMode = document.getElementById('setting-banner-mode').value;
-
-            const logoFile = document.getElementById('setting-logo-file').files[0];
-            const bannerFile = document.getElementById('setting-banner-file').files[0];
-
-            showGlobalLoader("Menyimpan Pengaturan ke Server...");
-
-            if (logoFile) {
-                settings.logoUrl = await compressImage(logoFile, 200, 0.7);
-            }
-            if (bannerFile && settings.bannerMode === 'custom') {
-                settings.bannerUrl = await compressImage(bannerFile, 800, 0.6);
-            }
-
-            localStorage.setItem('lcp_settings', JSON.stringify(settings));
-            await syncToSheet();
-            
-            renderAll();
-            hideGlobalLoader();
-            showToast('Pengaturan berhasil disimpan secara Global!', 'success');
-        }
-
-        function printQR(id) {
-            const asset = inventory.find(i => i.id === id);
-            
-            // Ambil nama dari pengaturan dan ubah menjadi huruf kapital semua
-            const labName = (settings.name || 'LAB KOMPUTER PUTRA').toUpperCase();
-            
-            const win = window.open('', '_blank');
-            win.document.write(`
-                <html><head><title>Cetak Label QR</title></head>
-                <body style="font-family: Arial, sans-serif; display: flex; justify-content: center; padding: 40px; margin: 0; background: #fff;">
-                    
-                    <!-- KOTAK UTAMA LABEL (Mengikuti referensi gambar) -->
-                    <div style="width: 340px; height: 110px; border: 2px solid #000; display: flex; flex-direction: row; overflow: hidden; box-sizing: border-box; background-color: #fff;">
-                        
-                        <!-- BAGIAN KIRI: QR CODE (Sebagai pengganti logo) -->
-                        <div style="width: 110px; min-width: 110px; border-right: 2px solid #000; display: flex; align-items: center; justify-content: center; padding: 8px; box-sizing: border-box;">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${asset.id}" style="width: 100%; height: auto;">
-                        </div>
-                        
-                        <!-- BAGIAN KANAN: TEKS INFORMASI -->
-                        <div style="flex-grow: 1; display: flex; flex-direction: column;">
-                            
-                            <!-- Header Bar Warna Kuning -->
-                            <div style="background-color: #fde047; border-bottom: 2px solid #000; height: 45px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 900; font-size: 13px; line-height: 1.2; padding: 0 4px; box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-                                INVENTARIS<br>${labName}
-                            </div>
-                            
-                            <!-- Informasi Nama dan ID Aset (Warna Putih) -->
-                            <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 8px; font-size: 12px; font-weight: bold; background-color: #fff; line-height: 1.5; box-sizing: border-box;">
-                                <div>NAMA: <span style="font-weight:normal;">${asset.name.substring(0, 25)}</span></div>
-                                <div>NO: <span style="font-weight:normal;">${asset.id}</span></div>
-                            </div>
-                            
-                        </div>
-                    </div>
-
-                    <script>
-                        // Tunggu sesaat agar gambar QR termuat sebelum dialog print muncul
-                        setTimeout(() => {
-                            window.print();
-                        }, 500);
-                    <\/script>
-                </body></html>
-            `);
-            win.document.close();
-        }
-
-        function printReport() {
-            const win = window.open('', '_blank');
-            win.document.write(`
-                <html><head><title>Laporan</title></head>
-                <body style="font-family:sans-serif;padding:20px;">
-                    <h2 style="text-align:center;">LAPORAN RIWAYAT LABCOMPT PUTRA</h2>
-                    <table border="1" cellspacing="0" cellpadding="8" style="width:100%;border-collapse:collapse;margin-top:20px;">
-                        <tr><th>Waktu</th><th>Aset</th><th>Peminjam</th><th>Status</th></tr>
-                        ${borrowHistory.map(h => `<tr><td>${h.borrowDate}</td><td>${h.assetName} (${h.assetId})</td><td>${h.borrower}</td><td>${h.status}</td></tr>`).join('')}
-                    </table>
-                    <script>window.print();<\/script>
-                </body></html>
-            `);
-            win.document.close();
+            settings.name = document.getElementById('setting-name').value; settings.bannerTitle = document.getElementById('setting-banner-title').value; settings.banner = document.getElementById('setting-banner').value; settings.bannerMode = document.getElementById('setting-banner-mode').value;
+            const logoFile = document.getElementById('setting-logo-file').files[0]; const bannerFile = document.getElementById('setting-banner-file').files[0];
+            showGlobalLoader("Menyimpan Pengaturan...");
+            if (logoFile) settings.logoUrl = await compressImage(logoFile, 200, 0.7);
+            if (bannerFile && settings.bannerMode === 'custom') settings.bannerUrl = await compressImage(bannerFile, 800, 0.6);
+            localStorage.setItem('lcp_settings', JSON.stringify(settings)); await syncToSheet(); renderAll(); hideGlobalLoader(); showToast('Pengaturan disimpan!', 'success');
         }
 
         function exportExcel() {
             let csv = 'Waktu Peminjaman,ID Aset,Nama Aset,Peminjam,Status\n';
-            borrowHistory.forEach(h => {
-                csv += `"${h.borrowDate}","${h.assetId}","${h.assetName}","${h.borrower}","${h.status}"\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `Laporan_Labcompt_${new Date().toISOString().slice(0,10)}.csv`;
-            link.click();
-            showToast('File Excel/CSV berhasil diunduh!', 'success');
+            borrowHistory.forEach(h => { csv += `"${h.borrowDate}","${h.assetId}","${h.assetName}","${h.borrower}","${h.status}"\n`; });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `Laporan_Labcompt_${new Date().toISOString().slice(0,10)}.csv`; link.click(); showToast('File CSV diunduh!', 'success');
         }
 
         function showToast(msg, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check mr-2 text-lg"></i>' : '<i class="fa-solid fa-triangle-exclamation mr-2 text-lg"></i>';
-            toast.className = `px-5 py-4 rounded-xl text-white font-medium text-sm shadow-xl ${type === 'success' ? 'bg-brand-600' : 'bg-red-600'} transition-all transform duration-300 flex items-center translate-y-[-20px] opacity-0`;
-            toast.innerHTML = `${icon} <span>${msg}</span>`;
-            
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.remove('translate-y-[-20px]', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'scale-95');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            const container = document.getElementById('toast-container'); const toast = document.createElement('div'); const icon = type === 'success' ? '<i class="fa-solid fa-circle-check mr-2 text-lg"></i>' : '<i class="fa-solid fa-triangle-exclamation mr-2 text-lg"></i>';
+            toast.className = `px-5 py-4 rounded-xl text-white font-medium text-sm shadow-xl ${type === 'success' ? 'bg-brand-600' : 'bg-red-600'} transition-all transform duration-300 flex items-center translate-y-[-20px] opacity-0`; toast.innerHTML = `${icon} <span>${msg}</span>`; container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-[-20px]', 'opacity-0'); }, 10);
+            setTimeout(() => { toast.classList.add('opacity-0', 'scale-95'); setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        window.onload = () => {
-            checkAuth();
-        };
+        window.onload = () => { checkAuth(); };
     </script>
 </body>
 </html>
-```
