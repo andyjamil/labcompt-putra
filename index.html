@@ -18,9 +18,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Library untuk mengubah desain HTML menjadi Gambar JPG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Library untuk membuat QR Code langsung tanpa internet/API luar -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 
     <script>
@@ -446,46 +444,29 @@
                             <input type="file" id="setting-banner-file" accept="image/*" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
 
-                        <!-- NEW: PENGATURAN POSISI LABEL STIKER -->
-                        <div class="mt-6 pt-6 border-t border-slate-200">
+                        <!-- PANEL KALIBRASI POSISI CETAK -->
+                        <div class="mt-8 pt-6 border-t border-slate-200">
                             <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <i class="fa-solid fa-arrows-up-down-left-right text-brand-600"></i> Kalibrasi Posisi Cetak Label (Geser Pixel)
+                                <i class="fa-solid fa-arrows-up-down-left-right text-brand-600"></i> Kalibrasi Posisi Cetak Label
                             </h3>
-                            <p class="text-xs text-slate-500 mb-4">Gunakan angka minus (contoh: -10) untuk menggeser ke arah sebaliknya (naik/kiri).</p>
+                            <p class="text-xs text-slate-500 mb-4">Gunakan angka minus (contoh: -10) untuk menggeser ke atas/kiri. Angka positif (contoh: 10) untuk ke bawah/kanan.</p>
                             
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-                                    <label class="block text-xs font-bold text-slate-700 mb-2">1. Ikon Kiri Atas</label>
-                                    <div class="flex gap-2">
-                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Atas/Bawah (Y)</label><input type="number" id="pos-icon-y" value="-12" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
-                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Kiri/Kanan (X)</label><input type="number" id="pos-icon-x" value="0" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
-                                    </div>
-                                </div>
-                                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-                                    <label class="block text-xs font-bold text-slate-700 mb-2">2. Angka Kanan Atas</label>
-                                    <div class="flex gap-2">
-                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Atas/Bawah (Y)</label><input type="number" id="pos-num-y" value="-15" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
-                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Kanan/Kiri (X)</label><input type="number" id="pos-num-x" value="0" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
-                                    </div>
-                                </div>
-                                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-                                    <label class="block text-xs font-bold text-slate-700 mb-2">3. Kotak QR Code</label>
-                                    <div class="flex gap-2">
-                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Atas/Bawah (Y)</label><input type="number" id="pos-qr-y" value="115" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
-                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Kanan/Kiri (X)</label><input type="number" id="pos-qr-x" value="35" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
-                                    </div>
-                                </div>
-                                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-                                    <label class="block text-xs font-bold text-slate-700 mb-2">4. Footer (Tameng & Teks)</label>
-                                    <div class="flex gap-2">
-                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Bawah/Atas (Y)</label><input type="number" id="pos-foot-y" value="10" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
-                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Kiri/Kanan (X)</label><input type="number" id="pos-foot-x" value="40" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
-                                    </div>
-                                </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                <div><label class="block text-xs font-semibold text-slate-700 mb-1">Ikon (Atas/Bawah)</label><input type="number" id="pos-icon-y" value="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm" onchange="applyCalibrationPreview()"></div>
+                                <div><label class="block text-xs font-semibold text-slate-700 mb-1">Ikon (Kiri/Kanan)</label><input type="number" id="pos-icon-x" value="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm" onchange="applyCalibrationPreview()"></div>
+                                
+                                <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nomor (Atas/Bawah)</label><input type="number" id="pos-num-y" value="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm" onchange="applyCalibrationPreview()"></div>
+                                <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nomor (Kiri/Kanan)</label><input type="number" id="pos-num-x" value="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm" onchange="applyCalibrationPreview()"></div>
+                                
+                                <div><label class="block text-xs font-semibold text-slate-700 mb-1">QR Code (Atas/Bawah)</label><input type="number" id="pos-qr-y" value="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm" onchange="applyCalibrationPreview()"></div>
+                                <div><label class="block text-xs font-semibold text-slate-700 mb-1">QR Code (Kiri/Kanan)</label><input type="number" id="pos-qr-x" value="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm" onchange="applyCalibrationPreview()"></div>
+                                
+                                <div><label class="block text-xs font-semibold text-slate-700 mb-1">Tameng (Atas/Bawah)</label><input type="number" id="pos-footer-y" value="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm" onchange="applyCalibrationPreview()"></div>
+                                <div><label class="block text-xs font-semibold text-slate-700 mb-1">Tameng (Kiri/Kanan)</label><input type="number" id="pos-footer-x" value="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm" onchange="applyCalibrationPreview()"></div>
                             </div>
                         </div>
 
-                        <button onclick="saveSettings()" class="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-transform hover:scale-105 mt-2">Simpan Pengaturan</button>
+                        <button onclick="saveSettings()" class="w-full md:w-auto bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-transform hover:scale-105">Simpan Pengaturan</button>
                     </div>
                 </section>
             </div>
@@ -552,64 +533,62 @@
         </div>
     </div>
 
-    <!-- HIDDEN CONTAINER UNTUK MEMBUAT GAMBAR LABEL STIKER (MURNI HTML/CSS AGAR WARNA TIDAK PUDAR) -->
-    <div id="label-render-container" style="position: absolute; left: -9999px; top: -9999px; width: 800px; height: 400px; background-color: #f0f4f8; font-family: 'Inter', sans-serif; box-sizing: border-box; border-radius: 24px; overflow: hidden; border: 3px solid #0f2b4d;">
-        
-        <!-- HEADER -->
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 110px; background-color: #0f2b4d; display: flex; align-items: center;">
-            <div id="label-icon-box" style="width: 120px; text-align: center; color: white; font-size: 60px; z-index: 10; margin-top: -12px; margin-left: 0px;">
-                <i class="fa-solid fa-desktop"></i>
-            </div>
-            <div style="color: white; margin-left: 5px; z-index: 10;">
-                <h1 style="font-size: 38px; font-weight: 900; margin: 0; line-height: 1;">LAB KOMPUTER PUTRA</h1>
-                <h2 style="font-size: 22px; font-weight: 600; margin: 0; letter-spacing: 6px; color: #cbd5e1; margin-top: 5px;">I N V E N T A R I S</h2>
-            </div>
-            
-            <!-- Efek Potongan Miring Biru (Kanan Atas) -->
-            <div style="position: absolute; top: 0; right: -20px; width: 180px; height: 110px; background-color: #0284c7; transform: skewX(-25deg); transform-origin: bottom; z-index: 5;"></div>
-            
-            <!-- Tempat Angka -->
-            <div id="label-num" style="position: absolute; top: -15px; right: 0px; width: 140px; height: 110px; display: flex; justify-content: center; align-items: center; color: white; font-size: 58px; font-weight: 900; z-index: 10;">02</div>
+    <!-- WADAH LABEL CETAK PURE CSS (TANPA TEMPLATE, TANPA TEKS QR BAWAH, TANPA GARIS TAMENG) -->
+    <div id="label-render-container" style="position: absolute; left: -9999px; top: -9999px; width: 600px; height: 300px; background-color: white; border-radius: 20px; overflow: hidden; font-family: 'Inter', sans-serif; box-shadow: 0 0 0 2px #0f2b4d;">
+        <!-- Header Biru Tua -->
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 95px; background-color: #0f2b4d;"></div>
+
+        <!-- Potongan Biru Terang (Kanan Atas) -->
+        <div style="position: absolute; top: 0; right: -20px; width: 150px; height: 95px; background-color: #0284c7; transform: skewX(-20deg);"></div>
+
+        <!-- Ikon Pojok Kiri Atas -->
+        <div id="calib-icon" style="position: absolute; top: 12px; left: 60px; width: 85px; height: 85px; display: flex; justify-content: center; align-items: center; color: white; font-size: 65px; margin-top: -12px; transition: transform 0.2s;">
+            <i class="fa-solid fa-building" id="label-icon-box"></i>
         </div>
 
-        <!-- BODY (TEKS DATA KIRI) -->
-        <div style="position: absolute; top: 110px; left: 0; width: 550px; height: 230px; padding: 30px 40px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;">
-            <div style="display: flex; font-size: 24px; font-weight: 700; color: #0f2b4d;">
-                <div style="width: 200px;">Nama Barang</div><div style="margin-right: 15px;">:</div><div id="label-val-name">RUANG LAB</div>
-            </div>
-            <div style="display: flex; font-size: 24px; font-weight: 700; color: #0f2b4d;">
-                <div style="width: 200px;">Kode Barang</div><div style="margin-right: 15px;">:</div><div id="label-val-id">INV/LK.P/A/02</div>
-            </div>
-            <div style="display: flex; font-size: 24px; font-weight: 700; color: #0f2b4d;">
-                <div style="width: 200px;">Kategori</div><div style="margin-right: 15px;">:</div><div id="label-val-category">Ruangan</div>
-            </div>
-            <div style="display: flex; font-size: 24px; font-weight: 700; color: #0f2b4d;">
-                <div style="width: 200px;">Kondisi</div><div style="margin-right: 15px;">:</div><div id="label-val-cond">Baik</div>
-            </div>
+        <!-- Teks Header -->
+        <div style="position: absolute; top: 18px; left: 150px; color: white;">
+            <div style="font-size: 32px; font-weight: 800; letter-spacing: 1px; line-height: 1;">LAB KOMPUTER PUTRA</div>
+            <div style="font-size: 18px; font-weight: 600; letter-spacing: 10px; margin-top: 5px;">I N V E N T A R I S</div>
         </div>
 
-        <!-- BODY (QR CODE KANAN) -->
-        <div id="label-qr-wrapper" style="position: absolute; top: 115px; right: 35px; width: 180px; display: flex; flex-direction: column; align-items: center;">
-            <div style="background: white; padding: 10px; border-radius: 16px; border: 2px solid #cbd5e1; display: flex; justify-content: center; align-items: center;">
+        <!-- Nomor Pojok Kanan Atas -->
+        <div id="calib-num" style="position: absolute; top: 15px; right: 25px; width: 90px; color: white; font-size: 45px; font-weight: 900; text-align: center; line-height: 1; margin-top: -15px; transition: transform 0.2s;">
+            <span id="label-num">01</span>
+        </div>
+
+        <!-- Area Konten Putih -->
+        <div style="position: absolute; top: 95px; left: 0; width: 100%; height: 165px; background-color: #f0f4f8;"></div>
+
+        <!-- Detail Aset (Kiri) -->
+        <div style="position: absolute; top: 110px; left: 30px; font-size: 20px; color: #0f2b4d; font-weight: 700; line-height: 1.6;">
+            <table style="border: none;">
+                <tr><td style="width: 150px;">Nama Barang</td><td style="width: 20px;">:</td><td id="label-val-name">RUANG LAB</td></tr>
+                <tr><td>Kode Barang</td><td>:</td><td id="label-val-id">INV-LK-02</td></tr>
+                <tr><td>Kategori</td><td>:</td><td id="label-val-category">Ruangan</td></tr>
+                <tr><td>Kondisi</td><td>:</td><td id="label-val-cond">Baik</td></tr>
+            </table>
+        </div>
+
+        <!-- QR Code Container (Kanan) -->
+        <div id="calib-qr" style="position: absolute; top: 115px; right: 30px; width: 130px; display: flex; flex-direction: column; align-items: center; transition: transform 0.2s;">
+            <div style="width: 130px; height: 130px; background-color: white; border-radius: 10px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 <canvas id="label-qr-canvas"></canvas>
             </div>
-            <!-- PERBAIKAN: Display Flex & Align Items Center ditambahkan agar teks presisi di tengah vertikal & horizontal -->
-            <div id="label-qr-text" style="margin-top: 8px; background-color: #0f2b4d; color: white; padding: 6px 10px; border-radius: 999px; font-size: 16px; font-weight: 700; width: 100%; display: flex; justify-content: center; align-items: center; line-height: 1; white-space: nowrap; overflow: hidden; box-sizing: border-box;">
-                INV/LK.P/A/02
-            </div>
         </div>
 
-        <!-- FOOTER -->
-        <div id="label-footer" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 60px; background-color: #0f2b4d; display: flex; align-items: center; padding-left: 40px; padding-bottom: 10px; box-sizing: border-box;">
-            <div style="color: white; font-size: 22px; z-index: 10;"><i class="fa-solid fa-shield-halved"></i></div>
-            <div style="width: 2px; height: 26px; background-color: rgba(255,255,255,0.4); margin: 0 15px; z-index: 10;"></div>
-            <div style="color: white; font-size: 20px; font-weight: 600; z-index: 10;">Jaga Bersama, Gunakan dengan Bijak</div>
-            
-            <!-- Efek Potongan Miring Biru (Bawah Kanan) -->
-            <div style="position: absolute; bottom: 0; right: 100px; width: 45px; height: 60px; background-color: #0284c7; transform: skewX(-35deg); z-index: 5;"></div>
-            <div style="position: absolute; bottom: 0; right: -20px; width: 100px; height: 60px; background-color: #0284c7; transform: skewX(-35deg); z-index: 5;"></div>
+        <!-- Footer Biru Tua -->
+        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background-color: #0f2b4d;"></div>
+
+        <!-- Potongan Biru Terang (Kanan Bawah) -->
+        <div style="position: absolute; bottom: 0; right: 20px; width: 60px; height: 40px; background-color: #0284c7; transform: skewX(-30deg);"></div>
+        <div style="position: absolute; bottom: 0; right: -20px; width: 30px; height: 40px; background-color: #0284c7; transform: skewX(-30deg);"></div>
+
+        <!-- Teks Footer Kiri (Tameng) -->
+        <div id="calib-footer" style="position: absolute; bottom: 0; left: 30px; height: 40px; display: flex; align-items: center; color: white; transition: transform 0.2s;">
+            <i class="fa-solid fa-shield-halved" style="font-size: 18px;"></i>
+            <div style="font-size: 14px; font-weight: 600; margin-left: 12px;">Jaga Bersama, Gunakan dengan Bijak</div>
         </div>
-        
     </div>
 
     <script>
@@ -617,6 +596,12 @@
 
         let currentUser = null;
         let settings = JSON.parse(localStorage.getItem('lcp_settings')) || {};
+        
+        // PENGATURAN KALIBRASI POSISI LOKAL (TIDAK AKAN KERESET KETIKA RELOAD)
+        let labelPosSettings = JSON.parse(localStorage.getItem('lcp_label_pos')) || {
+            iconY: 0, iconX: 0, numY: 0, numX: 0, qrY: 0, qrX: 0, footerY: 0, footerX: 0
+        };
+
         let usersData = JSON.parse(localStorage.getItem('lcp_users')) || [];
         let inventory = JSON.parse(localStorage.getItem('lcp_inventory')) || [];
         let schedules = JSON.parse(localStorage.getItem('lcp_schedules')) || [];
@@ -635,6 +620,37 @@
             document.getElementById('global-loader').classList.remove('hidden');
         }
         function hideGlobalLoader() { document.getElementById('global-loader').classList.add('hidden'); }
+
+        // FUNGSI KALIBRASI POSISI
+        function initCalibrationFields() {
+            if(document.getElementById('pos-icon-y')) {
+                document.getElementById('pos-icon-y').value = labelPosSettings.iconY;
+                document.getElementById('pos-icon-x').value = labelPosSettings.iconX;
+                document.getElementById('pos-num-y').value = labelPosSettings.numY;
+                document.getElementById('pos-num-x').value = labelPosSettings.numX;
+                document.getElementById('pos-qr-y').value = labelPosSettings.qrY;
+                document.getElementById('pos-qr-x').value = labelPosSettings.qrX;
+                document.getElementById('pos-footer-y').value = labelPosSettings.footerY;
+                document.getElementById('pos-footer-x').value = labelPosSettings.footerX;
+            }
+            applyCalibrationPreview();
+        }
+
+        function applyCalibrationPreview() {
+            const iconY = document.getElementById('pos-icon-y')?.value || labelPosSettings.iconY;
+            const iconX = document.getElementById('pos-icon-x')?.value || labelPosSettings.iconX;
+            const numY = document.getElementById('pos-num-y')?.value || labelPosSettings.numY;
+            const numX = document.getElementById('pos-num-x')?.value || labelPosSettings.numX;
+            const qrY = document.getElementById('pos-qr-y')?.value || labelPosSettings.qrY;
+            const qrX = document.getElementById('pos-qr-x')?.value || labelPosSettings.qrX;
+            const footerY = document.getElementById('pos-footer-y')?.value || labelPosSettings.footerY;
+            const footerX = document.getElementById('pos-footer-x')?.value || labelPosSettings.footerX;
+            
+            document.getElementById('calib-icon').style.transform = `translate(${iconX}px, ${iconY}px)`;
+            document.getElementById('calib-num').style.transform = `translate(${numX}px, ${numY}px)`;
+            document.getElementById('calib-qr').style.transform = `translate(${qrX}px, ${qrY}px)`;
+            document.getElementById('calib-footer').style.transform = `translate(${footerX}px, ${footerY}px)`;
+        }
 
         async function manualSync() {
             showGlobalLoader("Menarik Data dari Excel...");
@@ -683,18 +699,6 @@
                         if(document.getElementById('setting-banner-title')) document.getElementById('setting-banner-title').value = settings.bannerTitle || "";
                         if(document.getElementById('setting-banner')) document.getElementById('setting-banner').value = settings.banner || "";
                         if(document.getElementById('setting-banner-mode')) document.getElementById('setting-banner-mode').value = settings.bannerMode || "default";
-                        
-                        // Populate Kalibrasi Posisi
-                        if(settings.labelPos) {
-                            if(document.getElementById('pos-icon-y')) document.getElementById('pos-icon-y').value = settings.labelPos.iconY !== undefined ? settings.labelPos.iconY : -12;
-                            if(document.getElementById('pos-icon-x')) document.getElementById('pos-icon-x').value = settings.labelPos.iconX !== undefined ? settings.labelPos.iconX : 0;
-                            if(document.getElementById('pos-num-y')) document.getElementById('pos-num-y').value = settings.labelPos.numY !== undefined ? settings.labelPos.numY : -15;
-                            if(document.getElementById('pos-num-x')) document.getElementById('pos-num-x').value = settings.labelPos.numX !== undefined ? settings.labelPos.numX : 0;
-                            if(document.getElementById('pos-qr-y')) document.getElementById('pos-qr-y').value = settings.labelPos.qrY !== undefined ? settings.labelPos.qrY : 115;
-                            if(document.getElementById('pos-qr-x')) document.getElementById('pos-qr-x').value = settings.labelPos.qrX !== undefined ? settings.labelPos.qrX : 35;
-                            if(document.getElementById('pos-foot-y')) document.getElementById('pos-foot-y').value = settings.labelPos.footY !== undefined ? settings.labelPos.footY : 10;
-                            if(document.getElementById('pos-foot-x')) document.getElementById('pos-foot-x').value = settings.labelPos.footX !== undefined ? settings.labelPos.footX : 40;
-                        }
                     }
 
                     localStorage.setItem('lcp_settings', JSON.stringify(settings));
@@ -734,6 +738,7 @@
                 applyPermissions();
                 fetchSheetData();
                 renderAll();
+                initCalibrationFields();
                 switchTab('dashboard');
             } else {
                 loginOverlay.classList.remove('hidden');
@@ -889,7 +894,7 @@
             buildPagination(filtered.length, currentPageInventory, 'inventory-pagination', 'changePageInventory');
         }
 
-        // FUNGSI BUAT LABEL .JPG YANG BARU (VIA TEMPLATE GAMBAR)
+        // FUNGSI BUAT LABEL .JPG YANG BARU (PURE CSS TANPA TEMPLATE)
         function downloadQRImage(id) {
             const index = inventory.findIndex(i => i.id === id);
             if (index === -1) return;
@@ -897,9 +902,9 @@
             
             showGlobalLoader("Merakit Label Stiker (JPG)...");
 
-            // Mengekstrak angka terakhir dari ID Aset (contoh: dari INV-A-001 menjadi 001)
-            const numberMatches = asset.id.match(/\d+/g);
-            const itemNum = numberMatches ? numberMatches[numberMatches.length - 1] : String(index + 1).padStart(2, '0');
+            // Ambil angka dari belakang ID Aset, kalau tidak ada pakai nomor urut tabel
+            const idMatches = asset.id.match(/\d+$/);
+            const itemNum = idMatches ? idMatches[0] : String(index + 1).padStart(2, '0');
             
             // Logika Smart Icon FontAwesome
             function getAssetIcon(name) {
@@ -922,7 +927,6 @@
                 return 'fa-solid fa-box'; // Default Icon
             }
 
-            // Logika Cerdas: Menentukan Kategori secara Otomatis dari Nama Aset
             function getAssetCategory(name) {
                 name = name.toLowerCase();
                 if(name.includes('pc') || name.includes('komputer') || name.includes('cpu') || name.includes('monitor') || name.includes('mouse') || name.includes('keyboard')) return 'Perangkat Komputer';
@@ -933,44 +937,30 @@
                 return 'Inventaris Umum';
             }
             
-            // TERAPKAN KALIBRASI POSISI DARI SETTINGS
-            const pos = settings.labelPos || { iconY: -12, iconX: 0, numY: -15, numX: 0, qrY: 115, qrX: 35, footY: 10, footX: 40 };
-            document.getElementById('label-icon-box').style.marginTop = `${pos.iconY}px`;
-            document.getElementById('label-icon-box').style.marginLeft = `${pos.iconX}px`;
-            document.getElementById('label-num').style.top = `${pos.numY}px`;
-            document.getElementById('label-num').style.right = `${pos.numX}px`;
-            document.getElementById('label-qr-wrapper').style.top = `${pos.qrY}px`;
-            document.getElementById('label-qr-wrapper').style.right = `${pos.qrX}px`;
-            document.getElementById('label-footer').style.paddingBottom = `${pos.footY}px`;
-            document.getElementById('label-footer').style.paddingLeft = `${pos.footX}px`;
-
-            // Masukkan data ke template DOM
-            document.getElementById('label-icon-box').innerHTML = `<i class="${getAssetIcon(asset.name)}"></i>`;
+            // Masukkan data ke HTML
+            document.getElementById('label-icon-box').className = getAssetIcon(asset.name);
             document.getElementById('label-num').innerText = itemNum;
             
             document.getElementById('label-val-name').innerText = asset.name.length > 22 ? asset.name.substring(0, 22) + '...' : asset.name;
             document.getElementById('label-val-id').innerText = asset.id;
-            document.getElementById('label-val-category').innerText = getAssetCategory(asset.name); // Otomatis mengisi Kategori
+            document.getElementById('label-val-category').innerText = getAssetCategory(asset.name); 
             document.getElementById('label-val-cond').innerText = asset.condition || 'Baik';
             
-            document.getElementById('label-qr-text').innerText = asset.id;
-
             // Generate QR Code menggunakan QRious ke dalam Canvas
             new QRious({
                 element: document.getElementById('label-qr-canvas'),
                 value: asset.id,
-                size: 140, // Disesuaikan dengan lebar layout murni HTML
+                size: 130, // ukuran canvas
                 level: 'H'
             });
 
-            // Beri waktu sebentar agar template image loading dan font termuat sepenuhnya
+            // Tunggu sebentar lalu render menjadi JPG
             setTimeout(() => {
                 const labelContainer = document.getElementById('label-render-container');
                 
                 html2canvas(labelContainer, {
-                    scale: 3,
-                    useCORS: true,
-                    backgroundColor: null // Transparan, karena background sudah pakai gambar
+                    scale: 3, // resolusi tinggi 3x lipat agar tidak pecah
+                    backgroundColor: null
                 }).then(canvas => {
                     const imgData = canvas.toDataURL("image/jpeg", 1.0);
                     const link = document.createElement('a');
@@ -984,10 +974,9 @@
                     hideGlobalLoader();
                     showToast('Gagal merender gambar label', 'error');
                 });
-            }, 600);
+            }, 300);
         }
 
-        // ... Sisa fungsi tidak berubah (renderSchedules, dll) ...
         function renderSchedules(resetPage = false) {
             if (resetPage) currentPageSchedule = 1;
             const tbody = document.getElementById('schedule-table-body');
@@ -1114,21 +1103,24 @@
         }
 
         async function saveSettings() {
+            // Simpan pengaturan form bawaan
             settings.name = document.getElementById('setting-name').value; settings.bannerTitle = document.getElementById('setting-banner-title').value; settings.banner = document.getElementById('setting-banner').value; settings.bannerMode = document.getElementById('setting-banner-mode').value;
-            
-            // Simpan Data Kalibrasi Posisi
-            settings.labelPos = {
-                iconY: parseInt(document.getElementById('pos-icon-y').value) || 0,
-                iconX: parseInt(document.getElementById('pos-icon-x').value) || 0,
-                numY: parseInt(document.getElementById('pos-num-y').value) || 0,
-                numX: parseInt(document.getElementById('pos-num-x').value) || 0,
-                qrY: parseInt(document.getElementById('pos-qr-y').value) || 0,
-                qrX: parseInt(document.getElementById('pos-qr-x').value) || 0,
-                footY: parseInt(document.getElementById('pos-foot-y').value) || 0,
-                footX: parseInt(document.getElementById('pos-foot-x').value) || 0
-            };
-
             const logoFile = document.getElementById('setting-logo-file').files[0]; const bannerFile = document.getElementById('setting-banner-file').files[0];
+            
+            // Simpan posisi kalibrasi ke variabel dan kunci secara lokal
+            labelPosSettings = {
+                iconY: document.getElementById('pos-icon-y').value,
+                iconX: document.getElementById('pos-icon-x').value,
+                numY: document.getElementById('pos-num-y').value,
+                numX: document.getElementById('pos-num-x').value,
+                qrY: document.getElementById('pos-qr-y').value,
+                qrX: document.getElementById('pos-qr-x').value,
+                footerY: document.getElementById('pos-footer-y').value,
+                footerX: document.getElementById('pos-footer-x').value
+            };
+            localStorage.setItem('lcp_label_pos', JSON.stringify(labelPosSettings));
+            applyCalibrationPreview();
+
             showGlobalLoader("Menyimpan Pengaturan...");
             if (logoFile) settings.logoUrl = await compressImage(logoFile, 200, 0.7);
             if (bannerFile && settings.bannerMode === 'custom') settings.bannerUrl = await compressImage(bannerFile, 800, 0.6);
