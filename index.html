@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <!-- Tailwind CSS, Chart.js, HTML2Canvas & QRious -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -543,7 +544,7 @@
 
         <!-- Ikon Pojok Kiri Atas -->
         <div id="calib-icon" style="position: absolute; top: 12px; left: 60px; width: 85px; height: 85px; display: flex; justify-content: center; align-items: center; color: white; font-size: 50px; margin-top: -12px; transition: transform 0.2s;">
-            <i class="fa-solid fa-building" id="label-icon-box"></i>
+            <i class="ph ph-buildings" id="label-icon-box"></i>
         </div>
 
         <!-- Teks Header -->
@@ -585,8 +586,8 @@
         <div style="position: absolute; bottom: 0; right: -20px; width: 30px; height: 40px; background-color: #0284c7; transform: skewX(-30deg);"></div>
 
         <!-- Teks Footer Kiri (Tameng) -->
-        <div id="calib-footer" style="position: absolute; bottom: 0; left: 30px; height: 40px; display: flex; align-items: center; color: white; transition: transform 0.2s;">
-            <i class="fa-solid fa-shield-halved" style="font-size: 18px;"></i>
+        <div id="calib-footer" style="position: absolute; bottom: 2; left: 30px; height: 40px; display: flex; align-items: center; color: white; transition: transform 0.2s;">
+            <i class="ph ph-shield-check" style="font-size: 20px;"></i>
             <div style="font-size: 14px; font-weight: 600; margin-left: 12px;">Jaga Bersama, Gunakan dengan Bijak</div>
         </div>
     </div>
@@ -906,25 +907,26 @@
             const idMatches = asset.id.match(/\d+$/);
             const itemNum = idMatches ? idMatches[0] : String(index + 1).padStart(2, '0');
             
-            // Logika Smart Icon FontAwesome
+            // Logika Smart Icon (Gaya Garis Tipis / Outline)
             function getAssetIcon(name) {
                 name = name.toLowerCase();
-                if(name.includes('pc') || name.includes('komputer') || name.includes('cpu')) return 'fa-solid fa-desktop';
-                if(name.includes('monitor') || name.includes('led') || name.includes('lcd')) return 'fa-solid fa-tv';
-                if(name.includes('keyboard')) return 'fa-solid fa-keyboard';
-                if(name.includes('mouse')) return 'fa-solid fa-computer-mouse';
-                if(name.includes('print')) return 'fa-solid fa-print';
-                if(name.includes('router') || name.includes('wifi') || name.includes('mikrotik')) return 'fa-solid fa-wifi';
-                if(name.includes('ups') || name.includes('power')) return 'fa-solid fa-plug';
-                if(name.includes('switch') || name.includes('hub')) return 'fa-solid fa-network-wired';
-                if(name.includes('proyek') || name.includes('projector')) return 'fa-solid fa-video';
-                if(name.includes('server')) return 'fa-solid fa-server';
-                if(name.includes('laptop') || name.includes('notebook')) return 'fa-solid fa-laptop';
-                if(name.includes('cctv') || name.includes('kamera') || name.includes('camera')) return 'fa-solid fa-video';
-                if(name.includes('gedung') || name.includes('ruang') || name.includes('lab')) return 'fa-solid fa-building';
-                if(name.includes('meja') || name.includes('kursi') || name.includes('lemari') || name.includes('rak')) return 'fa-solid fa-chair';
-                if(name.includes('jaring') || name.includes('kabel')) return 'fa-solid fa-ethernet';
-                return 'fa-solid fa-box'; // Default Icon
+                if(name.includes('pc') || name.includes('komputer') || name.includes('cpu')) return 'ph ph-desktop';
+                if(name.includes('monitor') || name.includes('led') || name.includes('lcd')) return 'ph ph-monitor';
+                if(name.includes('keyboard')) return 'ph ph-keyboard';
+                if(name.includes('mouse')) return 'ph ph-mouse';
+                if(name.includes('print')) return 'ph ph-printer';
+                if(name.includes('router') || name.includes('wifi') || name.includes('mikrotik')) return 'ph ph-router';
+                if(name.includes('ups') || name.includes('power')) return 'ph ph-plug';
+                if(name.includes('switch') || name.includes('hub')) return 'ph ph-arrows-left-right';
+                if(name.includes('proyek') || name.includes('projector')) return 'ph ph-projector-screen';
+                if(name.includes('server')) return 'ph ph-hard-drives';
+                if(name.includes('laptop') || name.includes('notebook')) return 'ph ph-laptop';
+                if(name.includes('cctv') || name.includes('kamera') || name.includes('camera')) return 'ph ph-security-camera';
+                if(name.includes('gedung') || name.includes('ruang') || name.includes('lab')) return 'ph ph-buildings';
+                if(name.includes('meja')) return 'ph ph-table';
+                if(name.includes('kursi') || name.includes('lemari') || name.includes('rak')) return 'ph ph-armchair';
+                if(name.includes('jaring') || name.includes('kabel')) return 'ph ph-plugs';
+                return 'ph ph-package'; // Ikon Default (Kardus)
             }
 
             function getAssetCategory(name) {
