@@ -659,6 +659,10 @@
             <div style="background: white; padding: 10px; border-radius: 16px; border: 2px solid #cbd5e1; display: flex; justify-content: center; align-items: center;">
                 <canvas id="label-qr-canvas"></canvas>
             </div>
+            <!-- PERBAIKAN: Display Flex & Align Items Center ditambahkan agar teks presisi di tengah vertikal & horizontal -->
+            <div id="label-qr-text" style="margin-top: 8px; background-color: #0f2b4d; color: white; border-radius: 999px; font-size: 16px; font-weight: 700; width: 100%; height: 32px; display: flex; justify-content: center; align-items: center; line-height: 1; white-space: nowrap; overflow: hidden; box-sizing: border-box; padding-bottom: 2px;">
+                INV/LK.P/A/02
+            </div>
         </div>
 
         <!-- FOOTER -->
@@ -666,7 +670,8 @@
             <!-- WRAPPER BARU: Agar Tameng dan Teks bisa digeser ke atas/bawah dengan bebas -->
             <div id="label-footer-content" style="display: flex; align-items: center; transform: translateY(0px); z-index: 10;">
                 <div style="color: white; font-size: 22px;"><i class="fa-solid fa-shield-halved"></i></div>
-                <div style="color: white; font-size: 20px; font-weight: 600; margin-left: 12px;">Jaga Bersama, Gunakan dengan Bijak</div>
+                <div style="width: 2px; height: 26px; background-color: rgba(255,255,255,0.4); margin: 0 15px;"></div>
+                <div style="color: white; font-size: 20px; font-weight: 600;">Jaga Bersama, Gunakan dengan Bijak</div>
             </div>
             
             <!-- Efek Potongan Miring Biru (Bawah Kanan) -->
@@ -1040,6 +1045,7 @@
             document.getElementById('label-val-id').innerText = asset.id;
             document.getElementById('label-val-cat').innerText = getAssetCat(asset.name);
             document.getElementById('label-val-cond').innerText = asset.condition;
+            document.getElementById('label-qr-text').innerText = asset.id;
 
             // Tunggu render DOM sesaat, lalu convert jadi JPG High-Res
             setTimeout(async () => {
