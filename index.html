@@ -512,51 +512,61 @@
         </div>
     </div>
 
-    <!-- HIDDEN CONTAINER UNTUK MEMBUAT GAMBAR LABEL STIKER (html2canvas) -->
-    <div id="label-render-container" style="position: absolute; left: -9999px; top: -9999px; width: 600px; height: 320px; background: #f0f4f8; border-radius: 16px; overflow: hidden; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; border: 2px solid #cbd5e1; box-sizing: border-box;">
+    <!-- HIDDEN CONTAINER UNTUK MEMBUAT GAMBAR LABEL STIKER (MURNI HTML/CSS AGAR WARNA TIDAK PUDAR) -->
+    <div id="label-render-container" style="position: absolute; left: -9999px; top: -9999px; width: 800px; height: 400px; background-color: #f0f4f8; font-family: 'Inter', sans-serif; box-sizing: border-box; border-radius: 24px; overflow: hidden; border: 3px solid #0f2b4d;">
         
-        <!-- Header -->
-        <div style="height: 100px; background-color: #0f2b4d; display: flex; align-items: center; color: white; position: relative;">
-            <div id="label-icon-box" style="width: 60px; height: 100%; flex: 0 0 100px; display: flex; align-items: center; justify-content: center; font-size: 46px; line-height: 1;">
+        <!-- HEADER -->
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 110px; background-color: #0f2b4d; display: flex; align-items: center;">
+            <div id="label-icon-box" style="width: 120px; text-align: center; color: white; font-size: 60px; z-index: 10;">
                 <i class="fa-solid fa-desktop"></i>
             </div>
-            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding-left: 4px;">
-                <div id="label-labname" style="font-size: 30px; font-weight: 900; letter-spacing: 1px; line-height: 1.1;">LAB KOMPUTER</div>
-                <div style="font-size: 15px; letter-spacing: 4px; font-weight: 600; color: #bae6fd; margin-top: 2px;">INVENTARIS</div>
+            <div style="color: white; margin-left: 5px; z-index: 10;">
+                <h1 style="font-size: 38px; font-weight: 900; margin: 0; line-height: 1;">LAB KOMPUTER PUTRA</h1>
+                <h2 style="font-size: 22px; font-weight: 600; margin: 0; letter-spacing: 6px; color: #cbd5e1; margin-top: 5px;">I N V E N T A R I S</h2>
             </div>
-            <!-- Skewed Number Right -->
-            <div style="background-color: #0284c7; width: 110px; height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 25px; font-size: 42px; font-weight: 900; clip-path: polygon(25% 0, 100% 0, 100% 100%, 0% 100%);">
-                <span id="label-num" style="transform: translateY(-2px); display: inline-block;">01</span>
+            
+            <!-- Efek Potongan Miring Biru (Kanan Atas) -->
+            <div style="position: absolute; top: 0; right: -20px; width: 180px; height: 110px; background-color: #0284c7; transform: skewX(-25deg); transform-origin: bottom; z-index: 5;"></div>
+            
+            <!-- Tempat Angka -->
+            <div id="label-num" style="position: absolute; top: 0; right: 0; width: 140px; height: 110px; display: flex; justify-content: center; align-items: center; color: white; font-size: 58px; font-weight: 900; z-index: 10;">02</div>
+        </div>
+
+        <!-- BODY (TEKS DATA KIRI) -->
+        <div style="position: absolute; top: 110px; left: 0; width: 550px; height: 230px; padding: 30px 40px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="display: flex; font-size: 24px; font-weight: 700; color: #0f2b4d;">
+                <div style="width: 200px;">Nama Barang</div><div style="margin-right: 15px;">:</div><div id="label-val-name">RUANG LAB</div>
+            </div>
+            <div style="display: flex; font-size: 24px; font-weight: 700; color: #0f2b4d;">
+                <div style="width: 200px;">Kode Barang</div><div style="margin-right: 15px;">:</div><div id="label-val-id">INV/LK.P/A/02</div>
+            </div>
+            <div style="display: flex; font-size: 24px; font-weight: 700; color: #0f2b4d;">
+                <div style="width: 200px;">Kategori</div><div style="margin-right: 15px;">:</div><div id="label-val-category">Ruangan</div>
+            </div>
+            <div style="display: flex; font-size: 24px; font-weight: 700; color: #0f2b4d;">
+                <div style="width: 200px;">Kondisi</div><div style="margin-right: 15px;">:</div><div id="label-val-cond">Baik</div>
             </div>
         </div>
-        
-        <!-- Body Info -->
-        <div style="flex: 1; background: #f0f4f8; display: flex; padding: 18px 25px;">
-            <!-- Details Left -->
-            <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; font-size: 17px; font-weight: 600; color: #0f2b4d;">
-                <div style="display: flex;"><div style="width: 140px;">Nama Barang</div><div>: <span id="label-name" style="font-weight: 700;">PC Komputer</span></div></div>
-                <div style="display: flex;"><div style="width: 140px;">Kode Barang</div><div>: <span id="label-id" style="font-weight: 700;">LK-001</span></div></div>
-                <div style="display: flex;"><div style="width: 140px;">Lokasi</div><div>: <span id="label-loc" style="font-weight: 700;">Lab 1</span></div></div>
-                <div style="display: flex;"><div style="width: 140px;">Kondisi</div><div>: <span id="label-cond" style="font-weight: 700;">Baik</span></div></div>
+
+        <!-- BODY (QR CODE KANAN) -->
+        <div style="position: absolute; top: 130px; right: 35px; width: 180px; display: flex; flex-direction: column; align-items: center;">
+            <div style="background: white; padding: 10px; border-radius: 16px; border: 2px solid #cbd5e1; display: flex; justify-content: center; align-items: center;">
+                <canvas id="label-qr-canvas"></canvas>
             </div>
-            <!-- QR Right -->
-            <div style="width: 140px; flex: 0 0 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 0;">
-                <div style="background: white; padding: 6px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); display: flex; justify-content: center; align-items: center;">
-                    <canvas id="label-qr-canvas"></canvas>
-                </div>
-                <div id="label-qr-text" style="margin-top: 7px; width: 140px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 13px; line-height: 1; font-weight: 700; background: #0284c7; color: white; padding: 6px 8px; border-radius: 99px; letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center;">LK-001</div>
+            <div id="label-qr-text" style="margin-top: 15px; background-color: #0f2b4d; color: white; padding: 8px 10px; border-radius: 999px; font-size: 16px; font-weight: 700; width: 100%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box;">
+                INV/LK.P/A/02
             </div>
         </div>
-        
-        <!-- Footer -->
-        <div style="background-color: #0f2b4d; height: 42px; min-height: 42px; flex: 0 0 42px; display: flex; align-items: center; justify-content: space-between; padding-left: 25px; color: white; font-size: 13px; font-weight: 600; box-sizing: border-box;">
-            <div style="display: flex; align-items: center; gap: 8px; line-height: 1; height: 100%; transform: none;">
-                <i class="fa-solid fa-shield-halved" style="margin-right: 0; font-size: 16px; line-height: 1; display: inline-flex; align-items: center;"></i> Jaga Bersama, Gunakan dengan Bijak
-            </div>
-            <div style="width: 100px; height: 100%; background-color: #0284c7; clip-path: polygon(25% 0, 100% 0, 100% 100%, 0 100%); display: flex; align-items: center; justify-content: center;">
-                <div style="width: 10px; height: 150%; background: rgba(255,255,255,0.25); transform: skewX(-20deg); margin-right: 10px;"></div>
-                <div style="width: 10px; height: 150%; background: rgba(255,255,255,0.25); transform: skewX(-20deg);"></div>
-            </div>
+
+        <!-- FOOTER -->
+        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 60px; background-color: #0f2b4d; display: flex; align-items: center; padding-left: 40px; box-sizing: border-box;">
+            <div style="color: white; font-size: 22px; z-index: 10;"><i class="fa-solid fa-shield-halved"></i></div>
+            <div style="width: 2px; height: 26px; background-color: rgba(255,255,255,0.4); margin: 0 15px; z-index: 10;"></div>
+            <div style="color: white; font-size: 20px; font-weight: 600; z-index: 10;">Jaga Bersama, Gunakan dengan Bijak</div>
+            
+            <!-- Efek Potongan Miring Biru (Bawah Kanan) -->
+            <div style="position: absolute; bottom: 0; right: 100px; width: 45px; height: 60px; background-color: #0284c7; transform: skewX(-35deg); z-index: 5;"></div>
+            <div style="position: absolute; bottom: 0; right: -20px; width: 100px; height: 60px; background-color: #0284c7; transform: skewX(-35deg); z-index: 5;"></div>
         </div>
         
     </div>
@@ -826,7 +836,7 @@
             buildPagination(filtered.length, currentPageInventory, 'inventory-pagination', 'changePageInventory');
         }
 
-        // FUNGSI BUAT LABEL .JPG YANG BARU
+        // FUNGSI BUAT LABEL .JPG YANG BARU (VIA TEMPLATE GAMBAR)
         function downloadQRImage(id) {
             const index = inventory.findIndex(i => i.id === id);
             if (index === -1) return;
@@ -834,86 +844,73 @@
             
             showGlobalLoader("Merakit Label Stiker (JPG)...");
 
-            // Format angka urutan (misal: 01, 02, 03)
-            const itemNum = String(index + 1).padStart(2, '0');
-            const labName = (settings.name || 'LAB KOMPUTER').toUpperCase();
+            // Mengekstrak angka terakhir dari ID Aset (contoh: dari INV-A-001 menjadi 001)
+            const numberMatches = asset.id.match(/\d+/g);
+            const itemNum = numberMatches ? numberMatches[numberMatches.length - 1] : String(index + 1).padStart(2, '0');
             
-            // Smart Icon: ikon otomatis menyesuaikan nama barang inventaris
+            // Logika Smart Icon FontAwesome
             function getAssetIcon(name) {
-                const n = (name || '').toLowerCase();
-
-                // Perangkat komputer
-                if (n.includes('pc') || n.includes('komputer') || n.includes('cpu') || n.includes('desktop')) return 'fa-solid fa-desktop';
-                if (n.includes('monitor') || n.includes('led') || n.includes('lcd')) return 'fa-solid fa-tv';
-                if (n.includes('keyboard')) return 'fa-solid fa-keyboard';
-                if (n.includes('mouse')) return 'fa-solid fa-computer-mouse';
-                if (n.includes('printer') || n.includes('print')) return 'fa-solid fa-print';
-                if (n.includes('laptop') || n.includes('notebook')) return 'fa-solid fa-laptop';
-                if (n.includes('server')) return 'fa-solid fa-server';
-
-                // Perangkat jaringan
-                if (n.includes('router') || n.includes('mikrotik')) return 'fa-solid fa-router';
-                if (n.includes('wifi') || n.includes('access point') || n.includes('hotspot')) return 'fa-solid fa-wifi';
-                if (n.includes('switch') || n.includes('hub')) return 'fa-solid fa-network-wired';
-                if (n.includes('jaring') || n.includes('kabel lan') || n.includes('ethernet')) return 'fa-solid fa-ethernet';
-
-                // Perangkat pendukung / multimedia
-                if (n.includes('ups')) return 'fa-solid fa-battery-full';
-                if (n.includes('power') || n.includes('stop kontak') || n.includes('terminal')) return 'fa-solid fa-plug';
-                if (n.includes('proyektor') || n.includes('projector')) return 'fa-solid fa-video';
-                if (n.includes('cctv') || n.includes('kamera') || n.includes('camera')) return 'fa-solid fa-camera';
-                if (n.includes('speaker') || n.includes('sound')) return 'fa-solid fa-volume-high';
-                if (n.includes('headset') || n.includes(' headphone')) return 'fa-solid fa-headphones';
-
-                // Sarana ruang / inventaris gedung dan furniture
-                if (n.includes('gedung') || n.includes('bangunan')) return 'fa-solid fa-building';
-                if (n.includes('ruang') || n.includes('laboratorium') || n.includes('lab komputer')) return 'fa-solid fa-door-open';
-                if (n.includes('meja')) return 'fa-solid fa-table';
-                if (n.includes('kursi')) return 'fa-solid fa-chair';
-                if (n.includes('lemari')) return 'fa-solid fa-archive';
-                if (n.includes('rak')) return 'fa-solid fa-layer-group';
-                if (n.includes('papan tulis') || n.includes('whiteboard')) return 'fa-solid fa-chalkboard';
-                if (n.includes('ac') || n.includes('pendingin')) return 'fa-solid fa-snowflake';
-                if (n.includes('lampu')) return 'fa-solid fa-lightbulb';
-
-                return 'fa-solid fa-box'; // Ikon default untuk barang lain
+                name = name.toLowerCase();
+                if(name.includes('pc') || name.includes('komputer') || name.includes('cpu')) return 'fa-solid fa-desktop';
+                if(name.includes('monitor') || name.includes('led') || name.includes('lcd')) return 'fa-solid fa-tv';
+                if(name.includes('keyboard')) return 'fa-solid fa-keyboard';
+                if(name.includes('mouse')) return 'fa-solid fa-computer-mouse';
+                if(name.includes('print')) return 'fa-solid fa-print';
+                if(name.includes('router') || name.includes('wifi') || name.includes('mikrotik')) return 'fa-solid fa-wifi';
+                if(name.includes('ups') || name.includes('power')) return 'fa-solid fa-plug';
+                if(name.includes('switch') || name.includes('hub')) return 'fa-solid fa-network-wired';
+                if(name.includes('proyek') || name.includes('projector')) return 'fa-solid fa-video';
+                if(name.includes('server')) return 'fa-solid fa-server';
+                if(name.includes('laptop') || name.includes('notebook')) return 'fa-solid fa-laptop';
+                if(name.includes('cctv') || name.includes('kamera') || name.includes('camera')) return 'fa-solid fa-video';
+                if(name.includes('gedung') || name.includes('ruang') || name.includes('lab')) return 'fa-solid fa-building';
+                if(name.includes('meja') || name.includes('kursi') || name.includes('lemari') || name.includes('rak')) return 'fa-solid fa-chair';
+                if(name.includes('jaring') || name.includes('kabel')) return 'fa-solid fa-ethernet';
+                return 'fa-solid fa-box'; // Default Icon
             }
 
-            // Masukkan data ke template DOM tersembunyi
+            // Logika Cerdas: Menentukan Kategori secara Otomatis dari Nama Aset
+            function getAssetCategory(name) {
+                name = name.toLowerCase();
+                if(name.includes('pc') || name.includes('komputer') || name.includes('cpu') || name.includes('monitor') || name.includes('mouse') || name.includes('keyboard')) return 'Perangkat Komputer';
+                if(name.includes('router') || name.includes('wifi') || name.includes('switch') || name.includes('hub') || name.includes('kabel') || name.includes('jaring')) return 'Jaringan';
+                if(name.includes('proyek') || name.includes('projector') || name.includes('cctv') || name.includes('kamera') || name.includes('print')) return 'Multimedia / IT';
+                if(name.includes('meja') || name.includes('kursi') || name.includes('lemari') || name.includes('rak')) return 'Furnitur';
+                if(name.includes('gedung') || name.includes('ruang') || name.includes('lab')) return 'Ruangan';
+                return 'Inventaris Umum';
+            }
+            
+            // Masukkan data ke template DOM
             document.getElementById('label-icon-box').innerHTML = `<i class="${getAssetIcon(asset.name)}"></i>`;
-            document.getElementById('label-labname').innerText = labName;
             document.getElementById('label-num').innerText = itemNum;
             
-            document.getElementById('label-name').innerText = asset.name.length > 22 ? asset.name.substring(0, 22) + '...' : asset.name;
-            document.getElementById('label-id').innerText = asset.id;
-            document.getElementById('label-loc').innerText = asset.location || '-';
-            document.getElementById('label-cond').innerText = asset.condition || 'Baik';
+            document.getElementById('label-val-name').innerText = asset.name.length > 22 ? asset.name.substring(0, 22) + '...' : asset.name;
+            document.getElementById('label-val-id').innerText = asset.id;
+            document.getElementById('label-val-category').innerText = getAssetCategory(asset.name); // Otomatis mengisi Kategori
+            document.getElementById('label-val-cond').innerText = asset.condition || 'Baik';
+            
             document.getElementById('label-qr-text').innerText = asset.id;
 
             // Generate QR Code menggunakan QRious ke dalam Canvas
             new QRious({
                 element: document.getElementById('label-qr-canvas'),
                 value: asset.id,
-                size: 96,
-                level: 'H' // High Error Correction
+                size: 140, // Disesuaikan dengan lebar layout murni HTML
+                level: 'H'
             });
 
-            // Beri waktu sebentar agar font FontAwesome dan gambar termuat sepenuhnya
+            // Beri waktu sebentar agar template image loading dan font termuat sepenuhnya
             setTimeout(() => {
                 const labelContainer = document.getElementById('label-render-container');
                 
-                // Gunakan html2canvas untuk "Memotret" desain HTML menjadi gambar
                 html2canvas(labelContainer, {
-                    scale: 3, // Kualitas High-Res untuk cetak stiker
+                    scale: 3,
                     useCORS: true,
-                    backgroundColor: "#ffffff"
+                    backgroundColor: null // Transparan, karena background sudah pakai gambar
                 }).then(canvas => {
-                    // Konversi ke File JPG
                     const imgData = canvas.toDataURL("image/jpeg", 1.0);
-                    
-                    // Pemicu Download Otomatis
                     const link = document.createElement('a');
-                    link.download = `Label_Inventaris_Lab_${asset.id}.jpg`;
+                    link.download = `Label_Aset_${asset.id}.jpg`;
                     link.href = imgData;
                     link.click();
                     
