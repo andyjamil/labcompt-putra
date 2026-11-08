@@ -445,7 +445,47 @@
                             </select>
                             <input type="file" id="setting-banner-file" accept="image/*" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
-                        <button onclick="saveSettings()" class="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-transform hover:scale-105">Simpan Pengaturan</button>
+
+                        <!-- NEW: PENGATURAN POSISI LABEL STIKER -->
+                        <div class="mt-6 pt-6 border-t border-slate-200">
+                            <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-arrows-up-down-left-right text-brand-600"></i> Kalibrasi Posisi Cetak Label (Geser Pixel)
+                            </h3>
+                            <p class="text-xs text-slate-500 mb-4">Gunakan angka minus (contoh: -10) untuk menggeser ke arah sebaliknya (naik/kiri).</p>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                                    <label class="block text-xs font-bold text-slate-700 mb-2">1. Ikon Kiri Atas</label>
+                                    <div class="flex gap-2">
+                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Atas/Bawah (Y)</label><input type="number" id="pos-icon-y" value="-12" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
+                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Kiri/Kanan (X)</label><input type="number" id="pos-icon-x" value="0" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                                    <label class="block text-xs font-bold text-slate-700 mb-2">2. Angka Kanan Atas</label>
+                                    <div class="flex gap-2">
+                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Atas/Bawah (Y)</label><input type="number" id="pos-num-y" value="-15" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
+                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Kanan/Kiri (X)</label><input type="number" id="pos-num-x" value="0" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                                    <label class="block text-xs font-bold text-slate-700 mb-2">3. Kotak QR Code</label>
+                                    <div class="flex gap-2">
+                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Atas/Bawah (Y)</label><input type="number" id="pos-qr-y" value="115" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
+                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Kanan/Kiri (X)</label><input type="number" id="pos-qr-x" value="35" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                                    <label class="block text-xs font-bold text-slate-700 mb-2">4. Footer (Tameng & Teks)</label>
+                                    <div class="flex gap-2">
+                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Bawah/Atas (Y)</label><input type="number" id="pos-foot-y" value="10" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
+                                        <div class="flex-1"><label class="text-[10px] text-slate-500">Kiri/Kanan (X)</label><input type="number" id="pos-foot-x" value="40" class="w-full px-2 py-1.5 border rounded-lg text-sm"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="saveSettings()" class="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-transform hover:scale-105 mt-2">Simpan Pengaturan</button>
                     </div>
                 </section>
             </div>
@@ -517,7 +557,7 @@
         
         <!-- HEADER -->
         <div style="position: absolute; top: 0; left: 0; width: 100%; height: 110px; background-color: #0f2b4d; display: flex; align-items: center;">
-            <div id="label-icon-box" style="width: 120px; text-align: center; color: white; font-size: 60px; z-index: 10; margin-top: -18px;">
+            <div id="label-icon-box" style="width: 120px; text-align: center; color: white; font-size: 60px; z-index: 10; margin-top: -12px; margin-left: 0px;">
                 <i class="fa-solid fa-desktop"></i>
             </div>
             <div style="color: white; margin-left: 5px; z-index: 10;">
@@ -529,7 +569,7 @@
             <div style="position: absolute; top: 0; right: -20px; width: 180px; height: 110px; background-color: #0284c7; transform: skewX(-25deg); transform-origin: bottom; z-index: 5;"></div>
             
             <!-- Tempat Angka -->
-            <div id="label-num" style="position: absolute; top: 0; right: 0; width: 140px; height: 110px; display: flex; justify-content: center; align-items: center; color: white; font-size: 58px; font-weight: 900; z-index: 10; margin-top: -15px;">02</div>
+            <div id="label-num" style="position: absolute; top: -15px; right: 0px; width: 140px; height: 110px; display: flex; justify-content: center; align-items: center; color: white; font-size: 58px; font-weight: 900; z-index: 10;">02</div>
         </div>
 
         <!-- BODY (TEKS DATA KIRI) -->
@@ -549,17 +589,18 @@
         </div>
 
         <!-- BODY (QR CODE KANAN) -->
-        <div style="position: absolute; top: 115px; right: 35px; width: 180px; display: flex; flex-direction: column; align-items: center;">
+        <div id="label-qr-wrapper" style="position: absolute; top: 115px; right: 35px; width: 180px; display: flex; flex-direction: column; align-items: center;">
             <div style="background: white; padding: 10px; border-radius: 16px; border: 2px solid #cbd5e1; display: flex; justify-content: center; align-items: center;">
                 <canvas id="label-qr-canvas"></canvas>
             </div>
-            <div id="label-qr-text" style="margin-top: 1px; background-color: #0f2b4d; color: white; padding: 8px 10px; border-radius: 999px; font-size: 16px; font-weight: 700; width: 100%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box;">
+            <!-- PERBAIKAN: Display Flex & Align Items Center ditambahkan agar teks presisi di tengah vertikal & horizontal -->
+            <div id="label-qr-text" style="margin-top: 8px; background-color: #0f2b4d; color: white; padding: 6px 10px; border-radius: 999px; font-size: 16px; font-weight: 700; width: 100%; display: flex; justify-content: center; align-items: center; line-height: 1; white-space: nowrap; overflow: hidden; box-sizing: border-box;">
                 INV/LK.P/A/02
             </div>
         </div>
 
         <!-- FOOTER -->
-        <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 60px; background-color: #0f2b4d; display: flex; align-items: center; padding-left: 40px; padding-bottom: 1px; box-sizing: border-box;">
+        <div id="label-footer" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 60px; background-color: #0f2b4d; display: flex; align-items: center; padding-left: 40px; padding-bottom: 10px; box-sizing: border-box;">
             <div style="color: white; font-size: 22px; z-index: 10;"><i class="fa-solid fa-shield-halved"></i></div>
             <div style="width: 2px; height: 26px; background-color: rgba(255,255,255,0.4); margin: 0 15px; z-index: 10;"></div>
             <div style="color: white; font-size: 20px; font-weight: 600; z-index: 10;">Jaga Bersama, Gunakan dengan Bijak</div>
@@ -642,6 +683,18 @@
                         if(document.getElementById('setting-banner-title')) document.getElementById('setting-banner-title').value = settings.bannerTitle || "";
                         if(document.getElementById('setting-banner')) document.getElementById('setting-banner').value = settings.banner || "";
                         if(document.getElementById('setting-banner-mode')) document.getElementById('setting-banner-mode').value = settings.bannerMode || "default";
+                        
+                        // Populate Kalibrasi Posisi
+                        if(settings.labelPos) {
+                            if(document.getElementById('pos-icon-y')) document.getElementById('pos-icon-y').value = settings.labelPos.iconY !== undefined ? settings.labelPos.iconY : -12;
+                            if(document.getElementById('pos-icon-x')) document.getElementById('pos-icon-x').value = settings.labelPos.iconX !== undefined ? settings.labelPos.iconX : 0;
+                            if(document.getElementById('pos-num-y')) document.getElementById('pos-num-y').value = settings.labelPos.numY !== undefined ? settings.labelPos.numY : -15;
+                            if(document.getElementById('pos-num-x')) document.getElementById('pos-num-x').value = settings.labelPos.numX !== undefined ? settings.labelPos.numX : 0;
+                            if(document.getElementById('pos-qr-y')) document.getElementById('pos-qr-y').value = settings.labelPos.qrY !== undefined ? settings.labelPos.qrY : 115;
+                            if(document.getElementById('pos-qr-x')) document.getElementById('pos-qr-x').value = settings.labelPos.qrX !== undefined ? settings.labelPos.qrX : 35;
+                            if(document.getElementById('pos-foot-y')) document.getElementById('pos-foot-y').value = settings.labelPos.footY !== undefined ? settings.labelPos.footY : 10;
+                            if(document.getElementById('pos-foot-x')) document.getElementById('pos-foot-x').value = settings.labelPos.footX !== undefined ? settings.labelPos.footX : 40;
+                        }
                     }
 
                     localStorage.setItem('lcp_settings', JSON.stringify(settings));
@@ -880,6 +933,17 @@
                 return 'Inventaris Umum';
             }
             
+            // TERAPKAN KALIBRASI POSISI DARI SETTINGS
+            const pos = settings.labelPos || { iconY: -12, iconX: 0, numY: -15, numX: 0, qrY: 115, qrX: 35, footY: 10, footX: 40 };
+            document.getElementById('label-icon-box').style.marginTop = `${pos.iconY}px`;
+            document.getElementById('label-icon-box').style.marginLeft = `${pos.iconX}px`;
+            document.getElementById('label-num').style.top = `${pos.numY}px`;
+            document.getElementById('label-num').style.right = `${pos.numX}px`;
+            document.getElementById('label-qr-wrapper').style.top = `${pos.qrY}px`;
+            document.getElementById('label-qr-wrapper').style.right = `${pos.qrX}px`;
+            document.getElementById('label-footer').style.paddingBottom = `${pos.footY}px`;
+            document.getElementById('label-footer').style.paddingLeft = `${pos.footX}px`;
+
             // Masukkan data ke template DOM
             document.getElementById('label-icon-box').innerHTML = `<i class="${getAssetIcon(asset.name)}"></i>`;
             document.getElementById('label-num').innerText = itemNum;
@@ -1051,6 +1115,19 @@
 
         async function saveSettings() {
             settings.name = document.getElementById('setting-name').value; settings.bannerTitle = document.getElementById('setting-banner-title').value; settings.banner = document.getElementById('setting-banner').value; settings.bannerMode = document.getElementById('setting-banner-mode').value;
+            
+            // Simpan Data Kalibrasi Posisi
+            settings.labelPos = {
+                iconY: parseInt(document.getElementById('pos-icon-y').value) || 0,
+                iconX: parseInt(document.getElementById('pos-icon-x').value) || 0,
+                numY: parseInt(document.getElementById('pos-num-y').value) || 0,
+                numX: parseInt(document.getElementById('pos-num-x').value) || 0,
+                qrY: parseInt(document.getElementById('pos-qr-y').value) || 0,
+                qrX: parseInt(document.getElementById('pos-qr-x').value) || 0,
+                footY: parseInt(document.getElementById('pos-foot-y').value) || 0,
+                footX: parseInt(document.getElementById('pos-foot-x').value) || 0
+            };
+
             const logoFile = document.getElementById('setting-logo-file').files[0]; const bannerFile = document.getElementById('setting-banner-file').files[0];
             showGlobalLoader("Menyimpan Pengaturan...");
             if (logoFile) settings.logoUrl = await compressImage(logoFile, 200, 0.7);
